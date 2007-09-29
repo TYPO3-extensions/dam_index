@@ -134,8 +134,9 @@ class tx_damindex_index extends t3lib_extobjbase {
 		// doc and header init
 		//
 
-		$this->pObj->doc->form = '<form action=""'.htmlspecialchars(t3lib_div::linkThisScript($this->pObj->addParams)).'"" method="post" enctype="multipart/form-data" name="editform" autocomplete="off">';
+		$this->pObj->doc->form = $this->pObj->getFormTag();
 		#TODO ??? onSubmit="return TBE_EDITOR_checkSubmit(1);"
+		
 		$this->pObj->doc->form.= '<input type="hidden" name="SET[tx_dam_folder]" value="'.$this->pObj->path.'" />';
 
 
