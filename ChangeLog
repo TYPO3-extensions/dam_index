@@ -1,0 +1,19 @@
+06-09-01 Rene Fritz  <r.fritz@colorcube.de>
+
+	* Fix: tx_damindex_index. Removed newline from abstract in final index overview table. Caused JS error.
+	* Fix: tx_damindex_index. Removed t3lib_transferdata usage. Selected categories are now visible in form.
+
+06-06-06 Rene Fritz  <r.fritz@colorcube.de>
+
+	* Change: tx_damindex_index. Use 'tx_dam' instead of 'tx_dam_simpleforms' for use with t3lib_transferdata.
+	* Added tx_damindex_rule_titleFromFilename
+
+06-04-11 Rene Fritz  <r.fritz@colorcube.de>
+
+	* Fix: Added index->infoList to session so final list will be passed to ->postIndexing() in tx_dam_indexing
+	* Fix: Displaying selected categories in indexing preset form works now.
+	* Fix: Set indexing run types properly: man, auto, cron
+
+06-04-07 Rene Fritz  <r.fritz@colorcube.de>
+
+	* 1.0 release

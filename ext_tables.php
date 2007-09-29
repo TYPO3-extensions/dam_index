@@ -31,6 +31,7 @@ if (TYPO3_MODE=='BE')	{
 	tx_dam::register_indexingRule ('tx_damindex_rule_recursive', 'EXT:dam_index/lib/class.tx_damindex_rules.php:&tx_damindex_rule_recursive');
 	tx_dam::register_indexingRule ('tx_damindex_rule_folderAsCat', 'EXT:dam_index/lib/class.tx_damindex_rules.php:&tx_damindex_rule_folderAsCat');
 	tx_dam::register_indexingRule ('tx_damindex_rule_doReindexing', 'EXT:dam_index/lib/class.tx_damindex_rules.php:&tx_damindex_rule_doReindexing');
+	tx_dam::register_indexingRule ('tx_damindex_rule_titleFromFilename', 'EXT:dam_index/lib/class.tx_damindex_rules.php:&tx_damindex_rule_titleFromFilename');
 	tx_dam::register_indexingRule ('tx_damindex_rule_dryRun', 'EXT:dam_index/lib/class.tx_damindex_rules.php:&tx_damindex_rule_dryRun');
 
 	if($TYPO3_CONF_VARS['EXTCONF']['dam']['setup']['devel']) {

@@ -177,7 +177,8 @@ class tx_damindex_rule_folderAsCat extends tx_dam_indexRuleBase {
 
 			if($this->setup['fuzzy']) {
 				$folder = str_replace ('_', ' ', $folder);
-				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid', 'tx_dam_cat', 'title LIKE '.$GLOBALS['TYPO3_DB']->fullQuoteStr('%'.$folder.'%', 'tx_dam_cat'));
+				$likeStr = $GLOBALS['TYPO3_DB']->escapeStrForLike($folder,'tx_dam');
+				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid', 'tx_dam_cat', 'title LIKE '.$GLOBALS['TYPO3_DB']->fullQuoteStr('%'.$likeStr.'%', 'tx_dam_cat'));
 			} else {
 				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid', 'tx_dam_cat', 'title='.$GLOBALS['TYPO3_DB']->fullQuoteStr($folder, 'tx_dam_cat'));
 			}
@@ -333,7 +334,34 @@ class tx_damindex_rule_dryRun extends tx_dam_indexRuleBase {
 	}
 }
 
+/**
+ * Index rule plugin for the DAM
+ * Demo
+ *
+ * @author	Rene Fritz <r.fritz@colorcube.de>
+ * @package TYPO3
+ * @subpackage tx_dam
+ */
+class tx_damindex_rule_titleFromFilename extends tx_dam_indexRuleBase {
 
+	function getTitle()	{
+		global $LANG;
+		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:titleFromFilename.title');
+	}
+
+	function getDescription()	{
+		global $LANG;
+		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:titleFromFilename.desc');
+	}
+
+	function processMeta($meta)	{
+
+		$meta['fields']['title'] = tx_dam_indexing::makeTitleFromFilename ($meta['fields']['file_name']);
+
+		return $meta;
+	}
+
+}
 
 /**
  * Index rule plugin for the DAM
