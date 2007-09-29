@@ -291,6 +291,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 				$rec = array_merge($this->index->dataPreset,$this->index->dataPostset);
 				$fixedFields = array_keys($this->index->dataPostset);
+// TODO description wrong (german)?
 				$code = '<table border="0" cellpadding="4" width="100%"><tr>
 					<td bgcolor="'.$this->pObj->doc->bgColor3dim.'">'.$this->getPresetForm($rec,$fixedFields,'tx_damindex_index.fixed_desc').'</td>
 					</tr></table>';
@@ -548,6 +549,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 	function getPresetForm ($rec, $fixedFields, $langKeyDesc) {
 		global $LANG, $BACK_PATH, $TCA;
 
+
 		$content = '';
 		$editForm = '';
 
@@ -563,9 +565,11 @@ class tx_damindex_index extends t3lib_extobjbase {
 		$form->removeMM($TCA['tx_dam_simpleforms']);
 		$form->tx_dam_fixedFields = $fixedFields;
 
-		require_once (PATH_t3lib.'class.t3lib_transferdata.php');
-		$processData = t3lib_div::makeInstance('t3lib_transferData');
-		$rec = $processData->renderRecordRaw('tx_dam_simpleforms', $rec['uid'], $rec['pid'], $rec);
+// this is not needed, is it?
+//		require_once (PATH_t3lib.'class.t3lib_transferdata.php');
+//		$processData = t3lib_div::makeInstance('t3lib_transferData');
+//		$rec = $processData->renderRecordRaw('tx_dam', $rec['uid'], $rec['pid'], $rec);
+
 		$rec['uid'] = 1;
 		$rec['pid'] = 0;
 		$rec['media_type'] = TXDAM_mtype_undefined;
@@ -631,9 +635,11 @@ class tx_damindex_index extends t3lib_extobjbase {
 		$form->setNonEditable($TCA['tx_dam_simpleforms']);
 		$form->tx_dam_fixedFields = $fixedFields;
 
-		require_once (PATH_t3lib.'class.t3lib_transferdata.php');
-		$processData = t3lib_div::makeInstance('t3lib_transferData');
-		$rec = $processData->renderRecordRaw('tx_dam_simpleforms', $rec['uid'], $rec['pid'], $rec);
+// this is not needed, is it?
+//		require_once (PATH_t3lib.'class.t3lib_transferdata.php');
+//		$processData = t3lib_div::makeInstance('t3lib_transferData');
+//		$rec = $processData->renderRecordRaw('tx_dam', $rec['uid'], $rec['pid'], $rec);
+
 		$rec['uid'] = 1;
 		$rec['pid'] = 0;
 		$rec['media_type'] = TXDAM_mtype_undefined;
@@ -735,12 +741,18 @@ class tx_damindex_index extends t3lib_extobjbase {
 		$indexSession['currentCount']++;
 
 		if(is_array($meta) AND is_array($meta['fields'])) {
-			$ctable = array();
 
+			if(tx_dam::config_getValue('setup.debug')) {
+				t3lib_div::print_array(array(
+						'file_name' => $meta['fields']['file_name'],
+					));
+			}
+
+			$ctable = array();
 			$ctable[] = $GLOBALS['SOBE']->btn_editRec_inNewWindow('tx_dam', $meta['fields']['uid']);
 			$ctable[] = '<span style="white-space:nowrap;">'.tx_dam::icon_getFileTypeImgTag($meta['fields'],'align="top"').'&nbsp;'.htmlspecialchars(t3lib_div::fixed_lgd_cs($meta['fields']['file_name'],23)).'</span>';
 			$ctable[] = strtoupper($meta['fields']['file_type']);
-			$ctable[] = '<span style="white-space:nowrap;">'.htmlspecialchars(t3lib_div::fixed_lgd_cs($meta['fields']['abstract'],14)).'</span>';
+			$ctable[] = '<span style="white-space:nowrap;">'.htmlspecialchars(str_replace("\n", ' ', t3lib_div::fixed_lgd_cs($meta['fields']['abstract'],14))).'</span>';
 			$ctable[] = htmlspecialchars(t3lib_div::fixed_lgd_cs($meta['fields']['file_path'],-15));
 
 			$this->indexing_addTableRow($ctable);
