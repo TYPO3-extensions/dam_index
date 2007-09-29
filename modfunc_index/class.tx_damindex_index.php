@@ -419,7 +419,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 				$content.= $this->pObj->doc->section($LANG->getLL('tx_damindex_index.indexed_files'),'',0,1);
 				$content.= $this->pObj->doc->spacer(10);
 
-				if(tx_dam::config_getValue('setup.debug')) {
+				if(tx_dam::config_getValue('setup.devel')) {
 					$iframeSize = 'width="100%" height="300" border="1" scrolling="yes" frameborder="1"';
 				} else {
 					$iframeSize = 'width="0" height="0" border="0" scrolling="no" frameborder="0"';
@@ -702,7 +702,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 			$this->index->infoList = is_array($indexSession['infoList']) ? $indexSession['infoList'] : array();
 		}
 
-		if(tx_dam::config_getValue('setup.debug')) {
+		if(tx_dam::config_getValue('setup.devel')) {
 			t3lib_div::print_array($indexSession);
 		}
 
@@ -745,7 +745,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 		if(is_array($meta) AND is_array($meta['fields'])) {
 
-			if(tx_dam::config_getValue('setup.debug')) {
+			if(tx_dam::config_getValue('setup.devel')) {
 				t3lib_div::print_array(array(
 						'file_name' => $meta['fields']['file_name'],
 						'indexExist' => $meta['indexExist'],
