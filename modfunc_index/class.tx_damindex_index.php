@@ -564,7 +564,6 @@ class tx_damindex_index extends t3lib_extobjbase {
 		$form->initDefaultBEmode();
 		$form->setVirtualTable('tx_dam_simpleforms', 'tx_dam');
 		$form->removeRequired($TCA['tx_dam_simpleforms']);
-		$form->removeTreeViewBrowseable($TCA['tx_dam_simpleforms']);
 		$form->removeMM($TCA['tx_dam_simpleforms']);
 		$form->tx_dam_fixedFields = $fixedFields;
 
