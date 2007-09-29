@@ -34,44 +34,43 @@
  *
  *
  *
- *   92: class tx_damindex_index extends t3lib_extobjbase
- *  108:     function modMenu()
- *  125:     function head()
+ *   91: class tx_damindex_index extends t3lib_extobjbase
+ *  107:     function modMenu()
+ *  124:     function head()
  *  168:     function main()
  *  186:     function getCurrentFunc()
  *  207:     function moduleContent($header='', $description='', $lastStep=4)
- *  310:     function showProgress()
- *  370:     function progress_bar_update(intCurrentPercent)
- *  381:     function addTableRow(cells)
- *  403:     function setMessage(msg)
- *  408:     function finished()
+ *  311:     function showProgress()
+ *  368:     function progress_bar_update(intCurrentPercent)
+ *  379:     function addTableRow(cells)
+ *  401:     function setMessage(msg)
+ *  406:     function finished()
  *
  *              SECTION: Rendering the forms etc
  *  550:     function getPresetForm ($rec, $fixedFields, $langKeyDesc)
- *  618:     function showPresetData ($rec,$fixedFields)
- *  671:     function doIndexing($indexSessionID)
- *  729:     function doIndexingCallback($type, $meta, $absFile, $fileArrKey, &$pObj)
- *  779:     function indexing_progressBar($intCurrentCount = 100, $intTotalCount = 100)
- *  800:     function indexing_addTableRow($contentArr)
- *  814:     function indexing_setMessage($msg)
- *  823:     function indexing_finished()
- *  832:     function indexing_flushNow()
+ *  622:     function showPresetData ($rec,$fixedFields)
+ *  678:     function doIndexing($indexSessionID)
+ *  735:     function doIndexingCallback($type, $meta, $absFile, $fileArrKey, &$pObj)
+ *  806:     function indexing_progressBar($intCurrentCount = 100, $intTotalCount = 100)
+ *  827:     function indexing_addTableRow($contentArr)
+ *  841:     function indexing_setMessage($msg)
+ *  850:     function indexing_finished()
+ *  859:     function indexing_flushNow()
  *
  *              SECTION: indexSession
- *  854:     function indexSessionClear()
- *  864:     function indexSessionNew($filesTodo)
- *  881:     function indexSessionFetch()
- *  890:     function indexSessionWrite($indexSession)
+ *  881:     function indexSessionClear()
+ *  891:     function indexSessionNew($filesTodo)
+ *  908:     function indexSessionFetch()
+ *  917:     function indexSessionWrite($indexSession)
  *
  *              SECTION: GUI
- *  912:     function getStepsBar($currentStep, $lastStep, $onClickBack='' ,$onClickFwd='', $buttonNameBack='', $buttonNameFwd='')
+ *  939:     function getStepsBar($currentStep, $lastStep, $onClickBack='' ,$onClickFwd='', $buttonNameBack='', $buttonNameFwd='')
  *
  *              SECTION: this and that
- *  957:     function processIndexSetup()
- * 1011:     function saveSettings()
- * 1037:     function modifyValuesForDisplay ($rec)
+ *  984:     function processIndexSetup()
+ * 1041:     function saveSettings()
  *
- * TOTAL FUNCTIONS: 27
+ * TOTAL FUNCTIONS: 26
  * (This index is automatically created/updated by the script "update-class-index")
  *
  */
@@ -291,7 +290,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 				$rec = array_merge($this->index->dataPreset,$this->index->dataPostset);
 				$fixedFields = array_keys($this->index->dataPostset);
-// TODO description wrong (german)?
+
 				$code = '<table border="0" cellpadding="4" width="100%"><tr>
 					<td bgcolor="'.$this->pObj->doc->bgColor3dim.'">'.$this->getPresetForm($rec,$fixedFields,'tx_damindex_index.fixed_desc').'</td>
 					</tr></table>';
@@ -379,7 +378,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 					function addTableRow(cells) {
 
-						document.getElementById("table1").style.visibility = "visible";
+						document.getElementById("table1").style.display = "block";
 
 						var tbody = document.getElementById("table1").getElementsByTagName("tbody")[0];
 						var row = document.createElement("TR");
@@ -446,12 +445,13 @@ class tx_damindex_index extends t3lib_extobjbase {
 				';
 
 				if ($this->index->ruleConf['tx_damindex_rule_dryRun']['enabled']) {
-					$code.= '<div><strong class="diff-r">'.$LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:dryRun.title').'!</strong></div>';
+					$code.= '<div><strong class="diff-r">'.$LANG->sL('LLL:EXT:dam/components/locallang_indexrules.xml:dryRun.title').'!</strong></div>';
 				}
 
 				$code.= '
-					 <div id="message"></div>
-					 <table id="table1" style="visibility:hidden" cellpadding="1" cellspacing="1" border="0" width="100%">
+					<div id="message" style="margin-top:1em;"></div>
+					<div id="table1" style="display:none;margin-top:1em;">
+					 <table cellpadding="1" cellspacing="1" border="0" width="100%">
 					 <tr id="table1header" class="bgColor5">
 						 <th>&nbsp;</th>
 						 <th>'.$LANG->sL('LLL:EXT:dam/locallang_db.xml:tx_dam_item.file_name',1).'</th>
@@ -460,6 +460,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 						 <th>'.$LANG->sL('LLL:EXT:dam/locallang_db.xml:tx_dam_item.file_path',1).'</th>
 					</tr>
 					</table>
+					</div>
 				';
 				$content.= $this->pObj->doc->section('',$code,0,1);
 			break;
@@ -573,6 +574,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 		$rec['uid'] = 1;
 		$rec['pid'] = 0;
 		$rec['media_type'] = TXDAM_mtype_undefined;
+		$rec = tx_dam_db::evalData('tx_dam', $rec);
 
 
 		$columnsOnly = $TCA['tx_dam_simpleforms']['txdamInterface']['index_fieldList'];
@@ -635,14 +637,15 @@ class tx_damindex_index extends t3lib_extobjbase {
 		$form->setNonEditable($TCA['tx_dam_simpleforms']);
 		$form->tx_dam_fixedFields = $fixedFields;
 
-// this is not needed, is it?
-//		require_once (PATH_t3lib.'class.t3lib_transferdata.php');
-//		$processData = t3lib_div::makeInstance('t3lib_transferData');
-//		$rec = $processData->renderRecordRaw('tx_dam', $rec['uid'], $rec['pid'], $rec);
 
 		$rec['uid'] = 1;
 		$rec['pid'] = 0;
 		$rec['media_type'] = TXDAM_mtype_undefined;
+		$rec = tx_dam_db::evalData('tx_dam', $rec);
+
+			// workaround for the dumb formatValue function in tceforms which do not handle empty strings
+		$rec['date_cr'] = intval($rec['date_cr']);
+		$rec['date_mod'] = intval($rec['date_mod']);
 
 		$columnsOnly=$TCA['tx_dam']['txdamInterface']['index_fieldList'];
 
@@ -688,7 +691,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 			$this->indexing_setMessage($code);
 			$this->indexing_flushNow();
 
-				// TODO fetching file names is still without callback - billions of files will cause a timeout - ever?
+				// fetching file names is still without callback - billions of files will cause a timeout - ever?
 			$filesTodo = $this->index->collectFiles($this->pObj->path, $this->index->ruleConf['tx_damindex_rule_recursive']['enabled']);
 			$indexSession = $this->indexSessionNew($filesTodo);
 
@@ -706,9 +709,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 		if ($indexSession['totalFilesCount']) {
 
 			$this->index->collectMeta = TRUE;
-			$this->index->enableReindexing($this->index->ruleConf['tx_damindex_rule_doReindexing']['enabled']);
 			$this->index->setIndexRun($indexSession['indexRun']);
-			$this->index->setRunType('man');
 			$this->index->indexFiles($indexSession['filesTodo'], $this->pObj->defaultPid, array(&$this, 'doIndexingCallback'));
 
 			if (!$this->index->stat['totalCount']) {
@@ -745,20 +746,34 @@ class tx_damindex_index extends t3lib_extobjbase {
 			if(tx_dam::config_getValue('setup.debug')) {
 				t3lib_div::print_array(array(
 						'file_name' => $meta['fields']['file_name'],
+						'indexExist' => $meta['indexExist'],
+						'reindexed' => $meta['reindexed'],
+						'isIndexed' => $meta['isIndexed'],
 					));
 			}
 
-			$ctable = array();
-			$ctable[] = $GLOBALS['SOBE']->btn_editRec_inNewWindow('tx_dam', $meta['fields']['uid']);
-			$ctable[] = '<span style="white-space:nowrap;">'.tx_dam::icon_getFileTypeImgTag($meta['fields'],'align="top"').'&nbsp;'.htmlspecialchars(t3lib_div::fixed_lgd_cs($meta['fields']['file_name'],23)).'</span>';
-			$ctable[] = strtoupper($meta['fields']['file_type']);
-			$ctable[] = '<span style="white-space:nowrap;">'.htmlspecialchars(str_replace("\n", ' ', t3lib_div::fixed_lgd_cs($meta['fields']['abstract'],14))).'</span>';
-			$ctable[] = htmlspecialchars(t3lib_div::fixed_lgd_cs($meta['fields']['file_path'],-15));
+			if ($meta['isIndexed']) {
+				$failure = '';
+				$openRecPopup = '';
+				if ($meta['failure']) {
+					$failure .= '<br /><img'.t3lib_iconWorks::skinImg($GLOBALS['BACK_PATH'],'gfx/icon_fatalerror.gif','width="18" height="16"').' class="absmiddle" alt="" />';
+					$failure .= ' '.htmlspecialchars($meta['failure']);
+				} else {
+					$openRecPopup = $GLOBALS['SOBE']->btn_editRec_inNewWindow('tx_dam', $meta['fields']['uid']);
+				}
 
-			$this->indexing_addTableRow($ctable);
-			$msg = $LANG->getLL('tx_damindex_index.indexed_message',1);
-			$code = sprintf($msg, $this->index->stat['totalCount'], max(1,ceil($this->index->stat['totalTime']/1000)));
-			$this->indexing_setMessage($code);
+				$ctable = array();
+				$ctable[] = $openRecPopup;
+				$ctable[] = '<span style="white-space:nowrap;">'.tx_dam::icon_getFileTypeImgTag($meta['fields'],'align="top"').'&nbsp;'.htmlspecialchars(t3lib_div::fixed_lgd_cs($meta['fields']['file_name'],23)).'</span>'.$failure;
+				$ctable[] = strtoupper($meta['fields']['file_type']);
+				$ctable[] = '<span style="white-space:nowrap;">'.htmlspecialchars(str_replace("\n", ' ', t3lib_div::fixed_lgd_cs($meta['fields']['abstract'],14))).'</span>';
+				$ctable[] = htmlspecialchars(t3lib_div::fixed_lgd_cs($meta['fields']['file_path'],-15));
+
+				$this->indexing_addTableRow($ctable);
+				$msg = $LANG->getLL('tx_damindex_index.indexed_message',1);
+				$code = sprintf($msg, $this->index->stat['totalCount'], max(1,ceil($this->index->stat['totalTime']/1000)));
+				$this->indexing_setMessage($code);
+			}
 		}
 
 		$this->indexing_progressBar($indexSession['currentCount'], $indexSession['totalFilesCount']);
@@ -1013,6 +1028,8 @@ class tx_damindex_index extends t3lib_extobjbase {
 			}
 		}
 
+		$this->index->setOptionsFromRules();
+
 		$this->saveSettings();
 	}
 
@@ -1033,32 +1050,6 @@ class tx_damindex_index extends t3lib_extobjbase {
 			'tx_dam_folder' => $this->pObj->path,
 		);
 		$GLOBALS['SOBE']->MOD_SETTINGS = t3lib_BEfunc::getModuleData($GLOBALS['SOBE']->MOD_MENU, $newSettings, $GLOBALS['SOBE']->MCONF['name'], $GLOBALS['SOBE']->modMenu_type, $GLOBALS['SOBE']->modMenu_dontValidateList, $GLOBALS['SOBE']->modMenu_setDefaultList);
-	}
-
-
-
-
-
-	/**
-	 * Modifies values posted during the indexing process from step 3 to step 4
-	 * Used to display selected Categories in step 4
-	 *
-	 * @param	string		Path
-	 * @return	string		Output
-	 * @deprecated version - 10.04.2006
-	 * @todo remove this - is no longer used!?
-	 */
-	function modifyValuesForDisplay ($rec) {
-		$tmp = array();
-		if ($rec['category'] AND !strpos($rec['category'],'|')) {
-			$cats = implode(',',t3lib_div::trimExplode(',',$rec['category'],1));
-			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid,title','tx_dam_cat','uid IN ('.$cats.')');
-			while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-				$tmp[] = $row['uid'].'|'.$row['title'];
-			}
-			$rec['category'] = implode(',',$tmp);
-		}
-		return $rec;
 	}
 
 
