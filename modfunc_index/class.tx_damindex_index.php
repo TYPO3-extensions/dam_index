@@ -153,6 +153,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 		$this->index = t3lib_div::makeInstance('tx_dam_indexing');
 		$this->index->init();
+		$this->index->setRunType('man');
 
 
 			// initialize indexing setup
@@ -336,9 +337,6 @@ class tx_damindex_index extends t3lib_extobjbase {
 				$content.= $this->pObj->doc->spacer(10);
 
 				$rec = array_merge($this->index->dataPreset,$this->index->dataPostset);
-
-// TODO This is quick'n'dirty. The function simply modifies the comma separated UIDs in the category key into a comma separated list of UID|CategoryTitle pairs which can then be displayed in the form
-$rec = $this->modifyValuesForDisplay($rec);
 
 				$fixedFields=array_keys($this->index->dataPostset);
 				$content.= '<strong>'.$LANG->getLL('tx_damindex_index.meta_data_preset').'</strong><br /><table border="0" cellpadding="4" width="100%"><tr><td bgcolor="'.$this->pObj->doc->bgColor3dim.'">'.
@@ -690,6 +688,7 @@ $rec = $this->modifyValuesForDisplay($rec);
 
 		} else {
 			$this->index->stat = $indexSession['indexStat'];
+			$this->index->infoList = is_array($indexSession['infoList']) ? $indexSession['infoList'] : array();
 		}
 
 		if(tx_dam::config_getValue('setup.debug')) {
@@ -755,7 +754,8 @@ $rec = $this->modifyValuesForDisplay($rec);
 
 			// one step further - save session data
 		unset($indexSession['filesTodo'][$fileArrKey]);
-		$indexSession['indexStat'] =	$this->index->stat;
+		$indexSession['indexStat'] = $this->index->stat;
+		$indexSession['infoList'] =	$this->index->infoList;
 
 		$this->indexSessionWrite($indexSession);
 
@@ -969,12 +969,13 @@ $rec = $this->modifyValuesForDisplay($rec);
 			$this->index->dataPostset = t3lib_div::array_merge_recursive_overrule($this->index->dataPostset, $storedSetup['dataPostset']);
 		}
 
-
 			// merging values to the current indexing setup
 		$data = t3lib_div::_POST('data');
 
 		if (is_array($data['rules'])) {
 			$this->index->mergeRuleConf($data['rules']);
+		} else {
+			$this->index->mergeRuleConf();
 		}
 
 
@@ -1024,7 +1025,6 @@ $rec = $this->modifyValuesForDisplay($rec);
 
 
 
-// TODO -------------- quick fix - needs to be done right
 
 
 	/**
@@ -1033,6 +1033,8 @@ $rec = $this->modifyValuesForDisplay($rec);
 	 *
 	 * @param	string		Path
 	 * @return	string		Output
+	 * @deprecated version - 10.04.2006
+	 * @todo remove this - is no longer used!?
 	 */
 	function modifyValuesForDisplay ($rec) {
 		$tmp = array();
