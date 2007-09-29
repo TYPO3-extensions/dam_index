@@ -1,3 +1,7 @@
+06-11-24 Rene Fritz  <r.fritz@colorcube.de>
+
+	* Fix: tx_dam_index_rule_folderAsCat works again
+
 06-09-01 Rene Fritz  <r.fritz@colorcube.de>
 
 	* Fix: tx_damindex_index. Removed newline from abstract in final index overview table. Caused JS error.

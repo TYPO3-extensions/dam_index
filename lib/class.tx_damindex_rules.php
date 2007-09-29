@@ -172,15 +172,16 @@ class tx_damindex_rule_folderAsCat extends tx_dam_indexRuleBase {
 	 * @return	array Processed meta data array
 	 */
 	function processMeta($meta)	{
-		$folder = basename(preg_replace('#/$#','',$meta['file_path']));
+
+		$folder = basename(preg_replace('#/$#','',$meta['fields']['file_path']));
 		if ($folder) {
 
 			if($this->setup['fuzzy']) {
 				$folder = str_replace ('_', ' ', $folder);
 				$likeStr = $GLOBALS['TYPO3_DB']->escapeStrForLike($folder,'tx_dam');
-				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid', 'tx_dam_cat', 'title LIKE '.$GLOBALS['TYPO3_DB']->fullQuoteStr('%'.$likeStr.'%', 'tx_dam_cat'));
+				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid', 'tx_dam_cat', 'title LIKE '.$GLOBALS['TYPO3_DB']->fullQuoteStr('%'.$likeStr.'%', 'tx_dam_cat').' AND deleted=0');
 			} else {
-				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid', 'tx_dam_cat', 'title='.$GLOBALS['TYPO3_DB']->fullQuoteStr($folder, 'tx_dam_cat'));
+				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid', 'tx_dam_cat', 'title='.$GLOBALS['TYPO3_DB']->fullQuoteStr($folder, 'tx_dam_cat').' AND deleted=0');
 			}
 			$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 
