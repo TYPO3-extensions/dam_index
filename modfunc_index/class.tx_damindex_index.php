@@ -548,7 +548,8 @@ class tx_damindex_index extends t3lib_extobjbase {
 	 * @params  string
 	 */
 	function getPresetForm ($rec, $fixedFields, $langKeyDesc) {
-		global $LANG, $BACK_PATH, $TCA;
+		global $LANG, $BACK_PATH, $TCA, $TYPO3_CONF_VARS;
+		
 
 
 		$content = '';
@@ -620,7 +621,8 @@ class tx_damindex_index extends t3lib_extobjbase {
 	 * @return	string
 	 */
 	function showPresetData ($rec,$fixedFields) {
-		global $LANG, $BACK_PATH, $TCA;
+		global $LANG, $BACK_PATH, $TCA, $TYPO3_CONF_VARS;
+		
 
 		$content = '';
 
