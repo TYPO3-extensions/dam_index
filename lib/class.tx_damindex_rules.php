@@ -2,7 +2,7 @@
 /***************************************************************
 *  Copyright notice
 *
-*  (c) 2003-2005 René Fritz (r.fritz@colorcube.de)
+*  (c) 2003-2006 Rene Fritz (r.fritz@colorcube.de)
 *  All rights reserved
 *
 *  This script is part of the Typo3 project. The Typo3 project is
@@ -25,7 +25,7 @@
  * Index rule plugins for the DAM.
  * Part of the DAM (digital asset management) extension.
  *
- * @author	René Fritz <r.fritz@colorcube.de>
+ * @author	Rene Fritz <r.fritz@colorcube.de>
  * @package TYPO3
  * @subpackage tx_dam
  */
@@ -34,38 +34,41 @@
  *
  *
  *
- *   86: class tx_damindex_rule_recursive extends tx_dam_indexRuleBase 
- *   88:     function getTitle()	
+ *   79: class tx_damindex_rules
  *
  *
- *  107: class tx_damindex_rule_folderAsCat extends tx_dam_indexRuleBase 
- *  109:     function getTitle()	
- *  119:     function getDescription()	
- *  129:     function getOptionsForm()	
- *  144:     function getOptionsInfo()	
- *  158:     function processMeta($meta)	
+ *   93: class tx_damindex_rule_recursive extends tx_dam_indexRuleBase
+ *  100:     function getTitle()
  *
  *
- *  193: class tx_damindex_rule_doReindexing extends tx_dam_indexRuleBase 
- *  195:     function getTitle()	
- *  205:     function getDescription()	
- *  215:     function getOptionsForm()	
- *  233:     function getOptionsInfo()	
- *  251:     function processMeta($meta, $absFile, $idxObj)	
+ *  116: class tx_damindex_rule_folderAsCat extends tx_dam_indexRuleBase
+ *  123:     function getTitle()
+ *  133:     function getDescription()
+ *  143:     function getOptionsForm()
+ *  159:     function getOptionsInfo()
+ *  174:     function processMeta($meta)
  *
  *
- *  279: class tx_damindex_rule_dryRun extends tx_dam_indexRuleBase 
- *  281:     function getTitle()	
- *  291:     function getDescription()	
+ *  207: class tx_damindex_rule_doReindexing extends tx_dam_indexRuleBase
+ *  214:     function getTitle()
+ *  224:     function getDescription()
+ *  234:     function getOptionsForm()
+ *  253:     function getOptionsInfo()
+ *  270:     function processMeta($meta, $absFile, $idxObj)
  *
  *
- *  308: class tx_damindex_rule_devel extends tx_dam_indexRuleBase 
- *  310:     function getTitle()	
- *  320:     function getDescription()	
- *  330:     function preIndexing()	
+ *  313: class tx_damindex_rule_dryRun extends tx_dam_indexRuleBase
+ *  320:     function getTitle()
+ *  330:     function getDescription()
+ *
+ *
+ *  346: class tx_damindex_rule_devel extends tx_dam_indexRuleBase
+ *  353:     function getTitle()
+ *  363:     function getDescription()
+ *  374:     function preIndexing()
  *
  * TOTAL FUNCTIONS: 16
- * (This index is automatically created/updated by the extension "extdeveval")
+ * (This index is automatically created/updated by the script "update-class-index")
  *
  */
 
@@ -73,87 +76,100 @@ require_once(PATH_txdam.'lib/class.tx_dam_indexrulebase.php');
 
 
 
+class tx_damindex_rules {
+	// dummy for extmgm not to throw errors
+}
+
+
 
 /**
  * Index rule plugin for the DAM
  * Recursive
- * 
- * @author	René Fritz <r.fritz@colorcube.de>
+ *
+ * @author	Rene Fritz <r.fritz@colorcube.de>
  * @package TYPO3
  * @subpackage tx_dam
  */
 class tx_damindex_rule_recursive extends tx_dam_indexRuleBase {
 
+	/**
+	 * Returns the title of the index rule
+	 *
+	 * @return	string	Title
+	 */
 	function getTitle()	{
 		global $LANG;
-		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.php:recursive.title');
+		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:recursive.title');
 	}
 
-}
-
-class tx_damindex_rules {
-	// dummy for extmgm not to trow errors
 }
 
 
 /**
  * Index rule plugin for the DAM
  * Folder as category
- * 
- * @author	René Fritz <r.fritz@colorcube.de>
+ *
+ * @author	Rene Fritz <r.fritz@colorcube.de>
  * @package TYPO3
  * @subpackage tx_dam
  */
 class tx_damindex_rule_folderAsCat extends tx_dam_indexRuleBase {
 
+	/**
+	 * Returns the title of the index rule
+	 *
+	 * @return	string	Title
+	 */
 	function getTitle()	{
 		global $LANG;
-		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.php:folderAsCat.title');
+		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:folderAsCat.title');
 	}
 
 	/**
-	 * [Describe function...]
-	 * 
-	 * @return	[type]		...
+	 * Returns the description of the index rule
+	 *
+	 * @return	string	Description
 	 */
 	function getDescription()	{
 		global $LANG;
-		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.php:folderAsCat.desc');
+		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:folderAsCat.desc');
 	}
 
 	/**
-	 * [Describe function...]
-	 * 
-	 * @return	[type]		...
+	 * Returns the options form
+	 *
+	 * @return	string	HTML content
 	 */
 	function getOptionsForm()	{
-		global $LANG, $SOBE;
+		global $LANG;
 
 		$code = array();
 		$code[1][1] = 	'<input type="hidden" name="data[rules][tx_damindex_rule_folderAsCat][fuzzy]" value="0" />'.
 						'<input type="checkbox" name="data[rules][tx_damindex_rule_folderAsCat][fuzzy]"'.($this->setup['fuzzy']?' checked="checked"':'').' value="1" />&nbsp;';
-		$code[1][2] = $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.php:folderAsCat.use_fuzzy');
-		return $SOBE->doc->table($code);
+		$code[1][2] = $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:folderAsCat.use_fuzzy');
+		return $GLOBALS['SOBE']->doc->table($code);
 	}
 
 	/**
-	 * [Describe function...]
-	 * 
-	 * @return	[type]		...
+	 * Returns some information what options are selected.
+	 * This is for user feedback.
+	 *
+	 * @return	string	HTML content
 	 */
 	function getOptionsInfo()	{
 		global $LANG;
 		if($this->setup['fuzzy']) {
-			$out .= $this->getEnabledIcon().$LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.php:folderAsCat.use_fuzzy');
+			$out .= $this->getEnabledIcon().$LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:folderAsCat.use_fuzzy');
 		}
 		return $out;
 	}
 
 	/**
-	 * [Describe function...]
-	 * 
-	 * @param	[type]		$meta: ...
-	 * @return	[type]		...
+	 * For processing the meta data BEFORE the index is written
+	 *
+	 * @param	array		$meta Meta data array
+	 * @param	string		$absFile Filename
+	 * @return	array Processed meta data array
 	 */
 	function processMeta($meta)	{
 		$folder = basename(preg_replace('#/$#','',$meta['file_path']));
@@ -161,9 +177,9 @@ class tx_damindex_rule_folderAsCat extends tx_dam_indexRuleBase {
 
 			if($this->setup['fuzzy']) {
 				$folder = str_replace ('_', ' ', $folder);
-				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid', 'tx_dam_cat', 'title LIKE "%'.$GLOBALS['TYPO3_DB']->quoteStr($folder, 'tx_dam_cat').'%"');
+				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid', 'tx_dam_cat', 'title LIKE '.$GLOBALS['TYPO3_DB']->fullQuoteStr('%'.$folder.'%', 'tx_dam_cat'));
 			} else {
-				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid', 'tx_dam_cat', 'title="'.$GLOBALS['TYPO3_DB']->quoteStr($folder, 'tx_dam_cat').'"');
+				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid', 'tx_dam_cat', 'title='.$GLOBALS['TYPO3_DB']->fullQuoteStr($folder, 'tx_dam_cat'));
 			}
 			$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 
@@ -183,68 +199,73 @@ class tx_damindex_rule_folderAsCat extends tx_dam_indexRuleBase {
 /**
  * Index rule plugin for the DAM
  * Reindexing
- * 
- * @author	René Fritz <r.fritz@colorcube.de>
+ *
+ * @author	Rene Fritz <r.fritz@colorcube.de>
  * @package TYPO3
  * @subpackage tx_dam
  */
 class tx_damindex_rule_doReindexing extends tx_dam_indexRuleBase {
 
+	/**
+	 * Returns the title of the index rule
+	 *
+	 * @return	string	Title
+	 */
 	function getTitle()	{
 		global $LANG;
-		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.php:doReindexing.title');
+		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:doReindexing.title');
 	}
 
 	/**
-	 * [Describe function...]
-	 * 
-	 * @return	[type]		...
+	 * Returns the description of the index rule
+	 *
+	 * @return	string	Description
 	 */
 	function getDescription()	{
 		global $LANG;
-		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.php:doReindexing.desc');
+		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:doReindexing.desc');
 	}
 
 	/**
-	 * [Describe function...]
-	 * 
-	 * @return	[type]		...
+	 * Returns the options form
+	 *
+	 * @return	string	HTML content
 	 */
 	function getOptionsForm()	{
-		global $LANG, $SOBE;
+		global $LANG;
 
 		$code = array();
 		$code[1][1] = 	'<input type="hidden" name="data[rules][tx_damindex_rule_doReindexing][mode]" value="0" />'.
 						'<input type="radio" name="data[rules][tx_damindex_rule_doReindexing][mode]"'.(($this->setup['mode']==1)?' checked="checked"':'').' value="1" />&nbsp;';
-		$code[1][2] = $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.php:doReindexing.overwriteEmptyFields');
+		$code[1][2] = $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:doReindexing.overwriteEmptyFields');
 
 		$code[2][1] = 	'<input type="radio" name="data[rules][tx_damindex_rule_doReindexing][mode]"'.(($this->setup['mode']==2)?' checked="checked"':'').' value="2" />&nbsp;';
-		$code[2][2] = $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.php:doReindexing.reindexPreserve');
-		return $SOBE->doc->table($code);
+		$code[2][2] = $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:doReindexing.reindexPreserve');
+		return $GLOBALS['SOBE']->doc->table($code);
 	}
 
 	/**
-	 * [Describe function...]
-	 * 
-	 * @return	[type]		...
+	 * Returns some information what options are selected.
+	 * This is for user feedback.
+	 *
+	 * @return	string	HTML content
 	 */
 	function getOptionsInfo()	{
 		global $LANG;
 		if ($this->setup['mode']=='1') {
-			$out .= $this->getEnabledIcon().$LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.php:doReindexing.use_overwriteEmptyFields');
+			$out .= $this->getEnabledIcon().$LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:doReindexing.use_overwriteEmptyFields');
 		} elseif ($this->setup['mode']=='2') {
-			$out .= $this->getEnabledIcon().$LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.php:doReindexing.use_reindexPreserve');
+			$out .= $this->getEnabledIcon().$LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:doReindexing.use_reindexPreserve');
 		}
 		return $out;
 	}
 
 	/**
-	 * [Describe function...]
-	 * 
-	 * @param	[type]		$meta: ...
-	 * @param	[type]		$absFile: ...
-	 * @param	[type]		$idxObj: ...
-	 * @return	[type]		...
+	 * For processing the meta data BEFORE the index is written
+	 *
+	 * @param	array		$meta Meta data array
+	 * @param	string		$absFile Filename
+	 * @return	array Processed meta data array
 	 */
 	function processMeta($meta, $absFile, $idxObj)	{
 		if (is_array($meta['row']))	{
@@ -258,18 +279,19 @@ class tx_damindex_rule_doReindexing extends tx_dam_indexRuleBase {
 			if ($this->setup['mode']=='1') {
 					// overwrite empty fields
 				$meta['fields'] = t3lib_div::array_merge_recursive_overrule($meta['fields'],$meta['row'], FALSE, FALSE);
+
 			} elseif ($this->setup['mode']=='2') {
 					// preserve old data if new is empty
 				$meta['fields'] = t3lib_div::array_merge_recursive_overrule($meta['row'],$meta['fields'], FALSE, FALSE);
 			}
 
-#TODO use $idxObj->getFileNodeInfo() here?
+// TODO use $idxObj->getFileNodeInfo() here?
 				// no matter what the mode is the new file info (esp. mtime) should be renewed
 			$meta['fields']['file_mtime'] = $file_mtime;
 			$meta['fields']['file_ctime'] = $file_ctime;
 			$meta['fields']['file_inode'] = $file_inode;
 			$meta['fields']['file_size'] = $file_size;
-#TODO compute new checksum here?
+// TODO compute new checksum here?
 		}
 
 		return $meta;
@@ -283,26 +305,31 @@ class tx_damindex_rule_doReindexing extends tx_dam_indexRuleBase {
 /**
  * Index rule plugin for the DAM
  * Dry run
- * 
- * @author	René Fritz <r.fritz@colorcube.de>
+ *
+ * @author	Rene Fritz <r.fritz@colorcube.de>
  * @package TYPO3
  * @subpackage tx_dam
  */
 class tx_damindex_rule_dryRun extends tx_dam_indexRuleBase {
 
+	/**
+	 * Returns the title of the index rule
+	 *
+	 * @return	string	Title
+	 */
 	function getTitle()	{
 		global $LANG;
-		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.php:dryRun.title');
+		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:dryRun.title');
 	}
 
 	/**
-	 * [Describe function...]
-	 * 
-	 * @return	[type]		...
+	 * Returns the description of the index rule
+	 *
+	 * @return	string	Description
 	 */
 	function getDescription()	{
 		global $LANG;
-		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.php:dryRun.desc');
+		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:dryRun.desc');
 	}
 }
 
@@ -311,32 +338,38 @@ class tx_damindex_rule_dryRun extends tx_dam_indexRuleBase {
 /**
  * Index rule plugin for the DAM
  * Devel
- * 
- * @author	René Fritz <r.fritz@colorcube.de>
+ *
+ * @author	Rene Fritz <r.fritz@colorcube.de>
  * @package TYPO3
  * @subpackage tx_dam
  */
 class tx_damindex_rule_devel extends tx_dam_indexRuleBase {
 
+	/**
+	 * Returns the title of the index rule
+	 *
+	 * @return	string	Title
+	 */
 	function getTitle()	{
 		global $LANG;
-		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.php:devel.title');
+		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:devel.title');
 	}
 
 	/**
-	 * [Describe function...]
-	 * 
-	 * @return	[type]		...
+	 * Returns the description of the index rule
+	 *
+	 * @return	string	Description
 	 */
 	function getDescription()	{
 		global $LANG;
-		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.php:devel.desc');
+		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:devel.desc');
 	}
 
 	/**
-	 * [Describe function...]
-	 * 
-	 * @return	[type]		...
+	 * Will be called before the indexing.
+	 * Can be used to initialize things
+	 *
+	 * @return	void
 	 */
 	function preIndexing()	{
 		$GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_dam', '');
