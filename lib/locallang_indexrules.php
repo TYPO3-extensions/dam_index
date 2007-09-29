@@ -24,7 +24,7 @@ $LOCAL_LANG = Array (
 		
 		'folderAsCat.title' => 'Verzeichnisse als Kategorien verwenden',
 		'folderAsCat.desc' => 'Kategorien werden gesetzt falls die Datei in einem gleichnamigen Verzeichnis liegt.',
-		'folderAsCat.use_fuzzy' => 'Use fuzzy folder/category comparison.',
+		'folderAsCat.use_fuzzy' => 'Verzeichnisnamen auf Kategorienamen übertragen.',
 		
 		'dryRun.title' => 'Testlauf',
 		'dryRun.desc' => 'Es werden keine Daten zum DAM hinzugefügt sondern nur gezeigt was passieren würde',

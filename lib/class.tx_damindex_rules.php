@@ -2,7 +2,7 @@
 /***************************************************************
 *  Copyright notice
 *
-*  (c) 2003-2004 René Fritz (r.fritz@colorcube.de)
+*  (c) 2003-2005 René Fritz (r.fritz@colorcube.de)
 *  All rights reserved
 *
 *  This script is part of the Typo3 project. The Typo3 project is
@@ -83,7 +83,7 @@ require_once(PATH_txdam.'lib/class.tx_dam_indexrulebase.php');
  * @subpackage tx_dam
  */
 class tx_damindex_rule_recursive extends tx_dam_indexRuleBase {
-	
+
 	function getTitle()	{
 		global $LANG;
 		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.php:recursive.title');
@@ -91,7 +91,9 @@ class tx_damindex_rule_recursive extends tx_dam_indexRuleBase {
 
 }
 
-
+class tx_damindex_rules {
+	// dummy for extmgm not to trow errors
+}
 
 
 /**
@@ -166,9 +168,8 @@ class tx_damindex_rule_folderAsCat extends tx_dam_indexRuleBase {
 			$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 
 			if ($row['uid']) {
-				$meta['category']=$meta['category'].',tx_dam_cat_'.$row['uid'];
+				$meta['fields']['category'].= ',tx_dam_cat_'.$row['uid'];
 			}
-			#debug($meta['category']);
 
 		}
 		return $meta;
@@ -247,6 +248,13 @@ class tx_damindex_rule_doReindexing extends tx_dam_indexRuleBase {
 	 */
 	function processMeta($meta, $absFile, $idxObj)	{
 		if (is_array($meta['row']))	{
+
+				// this is the new file info ...
+			$file_mtime = $meta['fields']['file_mtime'];
+			$file_ctime = $meta['fields']['file_ctime'];
+			$file_inode = $meta['fields']['file_inode'];
+			$file_size = $meta['fields']['file_size'];
+
 			if ($this->setup['mode']=='1') {
 					// overwrite empty fields
 				$meta['fields'] = t3lib_div::array_merge_recursive_overrule($meta['fields'],$meta['row'], FALSE, FALSE);
@@ -254,8 +262,16 @@ class tx_damindex_rule_doReindexing extends tx_dam_indexRuleBase {
 					// preserve old data if new is empty
 				$meta['fields'] = t3lib_div::array_merge_recursive_overrule($meta['row'],$meta['fields'], FALSE, FALSE);
 			}
-		}		
-		
+
+#TODO use $idxObj->getFileNodeInfo() here?
+				// no matter what the mode is the new file info (esp. mtime) should be renewed
+			$meta['fields']['file_mtime'] = $file_mtime;
+			$meta['fields']['file_ctime'] = $file_ctime;
+			$meta['fields']['file_inode'] = $file_inode;
+			$meta['fields']['file_size'] = $file_size;
+#TODO compute new checksum here?
+		}
+
 		return $meta;
 	}
 
@@ -273,7 +289,7 @@ class tx_damindex_rule_doReindexing extends tx_dam_indexRuleBase {
  * @subpackage tx_dam
  */
 class tx_damindex_rule_dryRun extends tx_dam_indexRuleBase {
-	
+
 	function getTitle()	{
 		global $LANG;
 		return $LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.php:dryRun.title');
@@ -328,5 +344,9 @@ class tx_damindex_rule_devel extends tx_dam_indexRuleBase {
 	}
 
 }
+
+//if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/dam_index/lib/class.tx_damindex_rules.php'])	{
+//	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/dam_index/lib/class.tx_damindex_rules.php']);
+//}
 
 ?>
