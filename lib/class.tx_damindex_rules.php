@@ -177,7 +177,8 @@ class tx_damindex_rule_folderAsCat extends tx_dam_indexRuleBase {
 
 			if($this->setup['fuzzy']) {
 				$folder = str_replace ('_', ' ', $folder);
-				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid', 'tx_dam_cat', 'title LIKE '.$GLOBALS['TYPO3_DB']->fullQuoteStr('%'.$folder.'%', 'tx_dam_cat'));
+				$likeStr = $GLOBALS['TYPO3_DB']->escapeStrForLike($folder,'tx_dam');
+				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid', 'tx_dam_cat', 'title LIKE '.$GLOBALS['TYPO3_DB']->fullQuoteStr('%'.$likeStr.'%', 'tx_dam_cat'));
 			} else {
 				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid', 'tx_dam_cat', 'title='.$GLOBALS['TYPO3_DB']->fullQuoteStr($folder, 'tx_dam_cat'));
 			}
