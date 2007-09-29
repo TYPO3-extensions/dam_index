@@ -2,7 +2,7 @@
 /***************************************************************
 *  Copyright notice
 *
-*  (c) 2003-2006 Rene Fritz (r.fritz@colorcube.de)
+*  (c) 2003-2004 René Fritz (r.fritz@colorcube.de)
 *  All rights reserved
 *
 *  This script is part of the Typo3 project. The Typo3 project is
@@ -25,7 +25,7 @@
  * Module extension (addition to function menu) 'Index' for the 'Media>Index' module..
  * Part of the DAM (digital asset management) extension.
  *
- * @author	Rene Fritz <r.fritz@colorcube.de>
+ * @author	René Fritz <r.fritz@colorcube.de>
  * @package TYPO3
  * @subpackage tx_dam
  */
@@ -34,45 +34,27 @@
  *
  *
  *
- *   92: class tx_damindex_index extends t3lib_extobjbase
- *  108:     function modMenu()
- *  125:     function head()
- *  168:     function main()
- *  186:     function getCurrentFunc()
- *  207:     function moduleContent($header='', $description='', $lastStep=4)
- *  310:     function showProgress()
- *  370:     function progress_bar_update(intCurrentPercent)
- *  381:     function addTableRow(cells)
- *  403:     function setMessage(msg)
- *  408:     function finished()
+ *   76: class tx_damindex_index extends t3lib_extobjbase 
+ *   96:     function modMenu()    
+ *  124:     function head() 
+ *  161:     function main()	
+ *  264:     function moduleContent()    
+ *  367:     function showProgress() 
+ *
+ *              SECTION: Rendering general output
+ *  469:     function getStepsBar($currentStep,$lastStep=4) 
  *
  *              SECTION: Rendering the forms etc
- *  550:     function getPresetForm ($rec, $fixedFields, $langKeyDesc)
- *  618:     function showPresetData ($rec,$fixedFields)
- *  671:     function doIndexing($indexSessionID)
- *  729:     function doIndexingCallback($type, $meta, $absFile, $fileArrKey, &$pObj)
- *  779:     function indexing_progressBar($intCurrentCount = 100, $intTotalCount = 100)
- *  800:     function indexing_addTableRow($contentArr)
- *  814:     function indexing_setMessage($msg)
- *  823:     function indexing_finished()
- *  832:     function indexing_flushNow()
- *
- *              SECTION: indexSession
- *  854:     function indexSessionClear()
- *  864:     function indexSessionNew($filesTodo)
- *  881:     function indexSessionFetch()
- *  890:     function indexSessionWrite($indexSession)
- *
- *              SECTION: GUI
- *  912:     function getStepsBar($currentStep, $lastStep, $onClickBack='' ,$onClickFwd='', $buttonNameBack='', $buttonNameFwd='')
+ *  520:     function getPresetForm ($rec,$fixedFields,$langKeyDesc) 
+ *  589:     function showPresetData ($rec,$fixedFields) 
+ *  638:     function doIndex() 
  *
  *              SECTION: this and that
- *  957:     function processIndexSetup()
- * 1011:     function saveSettings()
- * 1037:     function modifyValuesForDisplay ($rec)
+ *  728:     function saveSettings() 
+ *  746:     function getBrowseableFolderList ($path, $folderParam) 
  *
- * TOTAL FUNCTIONS: 27
- * (This index is automatically created/updated by the script "update-class-index")
+ * TOTAL FUNCTIONS: 11
+ * (This index is automatically created/updated by the extension "extdeveval")
  *
  */
 
@@ -81,99 +63,98 @@
 
 require_once(PATH_t3lib.'class.t3lib_extobjbase.php');
 
+require_once(PATH_txdam.'lib/class.tx_dam_filelist.php');
 require_once(PATH_txdam.'lib/class.tx_dam_indexing.php');
 
 /**
  * Module 'Media>Index>Index'
  * Module 'Media>File>Index'
- *
- * @author	Rene Fritz <r.fritz@colorcube.de>
+ * 
+ * @author	René Fritz <r.fritz@colorcube.de>
  */
 class tx_damindex_index extends t3lib_extobjbase {
 
 
-
+	/**
+	 * basic-file-functions object
+	 */
+	var $basicFF;
+	
 	/**
 	 * indexing object
 	 */
 	var $index;
-
-
+	
+	
 
 	/**
 	 * Function menu initialization
-	 *
+	 * 
 	 * @return	array		Menu array
 	 */
 	function modMenu()    {
 		global $LANG;
-
-		return array(
-			'tx_damindex_index_func' => array(
+		
+		return array (
+			'tx_damindex_index_func' => array (
 				'index' => $LANG->getLL('tx_damindex_index.func_index'),
 				'info' => $LANG->getLL('tx_damindex_index.func_info'),
 			),
 		);
+
 	}
 
 
 	/**
 	 * Do some init things and aet some styles in HTML header
-	 *
-	 * @return	void
+	 * 
+	 * @return	void		
 	 */
 	function head() {
-		global  $LANG, $TYPO3_CONF_VARS, $FILEMOUNTS;
-
-
-		#TODO
-		$this->pObj->doc->bgColor3dim = t3lib_div::modifyHTMLcolor($this->pObj->doc->bgColor3,-5,-5,-5);
-		$this->pObj->doc->bgColor5lg = t3lib_div::modifyHTMLcolor($this->pObj->doc->bgColor5,25,25,25);
-
+		global $SOBE, $LANG, $TYPO3_CONF_VARS, $FILEMOUNTS;
 
 		//
 		// doc and header init
 		//
 
-		$this->pObj->doc->form = '<form action=""'.htmlspecialchars(t3lib_div::linkThisScript($this->pObj->addParams)).'"" method="post" enctype="multipart/form-data" name="editform" autocomplete="off">';
-		#TODO ??? onSubmit="return TBE_EDITOR_checkSubmit(1);"
+		$this->pObj->doc->form = '<form action=""'.t3lib_div::linkThisScript($this->pObj->addParams).'"" method="POST" enctype="multipart/form-data" name="editform" autocomplete="off">';
+		#TODO ??? onSubmit="return TBE_EDITOR_checkSubmit(1);" 
 		$this->pObj->doc->form.= '<input type="hidden" name="SET[tx_dam_folder]" value="'.$this->pObj->path.'" />';
 
 
 		//
 		// Init gui items and ...
 		//
-
-		$this->pObj->guiItems->registerFunc('getOptions', 'footer');
+		
+		$this->pObj->guiItems_registerFunc('getOptions', 'footer');
 
 
 		//
 		// Init indexing object
-		//
-
+		//	
+			
 		$this->index = t3lib_div::makeInstance('tx_dam_indexing');
 		$this->index->init();
-		$this->index->setRunType('man');
-
-
+		
+		
 			// initialize indexing setup
 		$this->processIndexSetup();
-	}
-
+	}	
+	
 
 	/**
 	 * Main function
-	 *
+	 * 
 	 * @return	string		HTML output
 	 */
 	function main()	{
-		global  $BE_USER, $LANG, $BACK_PATH;
-
+		global $SOBE, $BE_USER, $LANG, $BACK_PATH;
+		
 		$content = '';
-
-		$this->cmdIcons['funcMenu'] = t3lib_BEfunc::getFuncMenu($this->pObj->addParams,'SET[tx_damindex_index_func]',$GLOBALS['SOBE']->MOD_SETTINGS['tx_damindex_index_func'],$GLOBALS['SOBE']->MOD_MENU['tx_damindex_index_func']);
-
-		#$content.= $this->pObj->getPathInfoHeaderBar($this->pObj->pathInfo, TRUE, $this->cmdIcons);
+		
+		$this->cmdIcons['funcMenu'] = '&nbsp;&nbsp;&nbsp;'.t3lib_BEfunc::getFuncMenu($this->pObj->addParams,'SET[tx_damindex_index_func]',$SOBE->MOD_SETTINGS['tx_damindex_index_func'],$SOBE->MOD_MENU['tx_damindex_index_func']);
+		
+		#$content.= $this->pObj->getPathInfoHeaderBar($this->pObj->path, $FILEMOUNTS[$this->pObj->fmountID], TRUE, $this->cmdIcons);
 		#$content.= $this->pObj->doc->section('',$this->pObj->doc->funcMenu('',$this->cmdIcons['funcMenu']));
 
 
@@ -184,8 +165,22 @@ class tx_damindex_index extends t3lib_extobjbase {
 	}
 
 
-	function getCurrentFunc() {
-		$func = (string)$GLOBALS['SOBE']->MOD_SETTINGS['tx_damindex_index_func'];
+
+
+
+	/**
+	 * Generates the module content
+	 * 
+	 * @return	string		HTML content
+	 */
+	function moduleContent()    {
+		global $SOBE, $BE_USER, $LANG, $BACK_PATH, $FILEMOUNTS;
+	
+		$content = '';
+		
+		$data = t3lib_div::_GP('data');
+
+		$func = (string)$SOBE->MOD_SETTINGS['tx_damindex_index_func'];
 		if ($step = t3lib_div::_GP('indexStep')) {
 			$step = max(1,key($step));
 			$func = 'index'.$step;
@@ -193,77 +188,56 @@ class tx_damindex_index extends t3lib_extobjbase {
 		if (t3lib_div::_GP('indexStart')) {
 			$func = 'indexStart';
 		}
-		if (t3lib_div::_GP('doIndexing')) {
-			$func = 'doIndexing';
-		}
-		return $func;
-	}
 
 
-	/**
-	 * Generates the module content
-	 *
-	 * @return	string		HTML content
-	 */
-	function moduleContent($header='', $description='', $lastStep=4)    {
-		global  $BE_USER, $LANG, $BACK_PATH, $FILEMOUNTS, $TYPO3_CONF_VARS;
+		$cnBgColor = t3lib_div::modifyHTMLcolor($this->pObj->doc->bgColor3,-5,-5,-5);
+		
+		#TODO
+		$this->pObj->doc->lgBgColor5 = t3lib_div::modifyHTMLcolor($this->pObj->doc->bgColor5,25,25,25);
 
-		$content = '';
-
-		switch($this->getCurrentFunc())    {
-
+		switch($func)    {
+			
 			//
 			// select start folder
-			//
-
+			//			
+			
 			case 'index':
 			case 'index1':
-
-				$step = 1;
-
-				$content.= $this->pObj->getPathInfoHeaderBar($this->pObj->pathInfo, TRUE, $this->cmdIcons);
+				$step=1;
+				
+				$content.= $this->pObj->getPathInfoHeaderBar($this->pObj->path, $FILEMOUNTS[$this->pObj->fmountID], TRUE, $this->cmdIcons);
 				$content.= $this->pObj->doc->spacer(10);
-
-				$content.= $description;
-
+		
 				$store = t3lib_div::makeInstance('t3lib_modSettings');
 				$store->init('tx_damindex');
-				$store->type = 'perm';
 				$store->setStoreList('tx_damindex_indexSetup');
 				$store->processStoreControl();
-
+				
 				if ($code = $store->getStoreControl('load,remove')) {
 					$this->content.= $this->pObj->doc->section($LANG->getLL('tx_damindex_index.choose_preset'),$code,0,1);
 					$this->content.=$this->pObj->doc->spacer(10);
 				}
-
-				$header = $header ? $header : $LANG->getLL('tx_damindex_index.index_begin');
-				$content.= $this->pObj->doc->section($header,$this->getStepsBar($step,$lastStep),0,1);
+				
+				$content.= $this->pObj->doc->section($LANG->getLL('tx_damindex_index.index_begin'),$this->getStepsBar($step,$lastStep=4),0,1);
 				$content.= $this->pObj->doc->section('',$LANG->getLL('tx_damindex_index.choose_start_folder'),0,1);
 				$content.= $this->pObj->doc->spacer(10);
 
 
-				$content.= $this->pObj->getBrowseableFolderList($this->pObj->path);
+				$content.= $this->getBrowseableFolderList($this->pObj->path, 'SET[tx_dam_folder]');
 			break;
 
 
 			//
 			// select indexing options
-			//
-
+			//			
+			
 			case 'index2':
-
-				$step = 2;
-
-				$content.= $this->pObj->getPathInfoHeaderBar($this->pObj->pathInfo, FALSE, $this->cmdIcons);
+				$content.= $this->pObj->getPathInfoHeaderBar($this->pObj->path, $FILEMOUNTS[$this->pObj->fmountID], FALSE, $this->cmdIcons);
 				$content.= $this->pObj->doc->spacer(10);
-
-				$content.= $description;
-
-				$header = $header ? $header : $LANG->getLL('options');
-				$content.= $this->pObj->doc->section($header,$this->getStepsBar($step,$lastStep),0,1);
+				
+				$content.= $this->pObj->doc->section($LANG->getLL('options'),$this->getStepsBar($step,$lastStep=4),0,1);
 				$content.= $this->pObj->doc->spacer(5);
-
+				
 				$code = '<table border="0" cellspacing="0" cellpadding="4" width="100%">'.$this->index->getIndexingOptionsForm().'</table>';
 				$content.= $this->pObj->doc->section($LANG->getLL('options').':',$code,1,0);
 
@@ -272,28 +246,20 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 			//
 			// field predefinition
-			//
-
+			//			
+			
 			case 'index3':
-
-				$step = 3;
-
-				$content.= $this->pObj->getPathInfoHeaderBar($this->pObj->pathInfo, FALSE, $this->cmdIcons);
+				$content.= $this->pObj->getPathInfoHeaderBar($this->pObj->path, $FILEMOUNTS[$this->pObj->fmountID], FALSE, $this->cmdIcons);
 				$content.= $this->pObj->doc->spacer(10);
-
-				$content.= $description;
-
-				$header = $header ? $header : $LANG->getLL('tx_damindex_index.index_fields_preset');
-				$stepsBar = $this->getStepsBar($step,$lastStep, '' ,'return TBE_EDITOR_checkSubmit(1);');
-				$content.= $this->pObj->doc->section($header,$stepsBar,0,1);
+				
+				$content.= $this->pObj->doc->section($LANG->getLL('tx_damindex_index.index_fields_preset'),$this->getStepsBar($step,$lastStep=4),0,1);
 				$content.= $LANG->getLL('tx_damindex_index.preset_desc');
 				$content.= $this->pObj->doc->spacer(10);
 
-				$rec = array_merge($this->index->dataPreset,$this->index->dataPostset);
-				$fixedFields = array_keys($this->index->dataPostset);
-// TODO description wrong (german)?
+				$rec=array_merge($this->index->dataPreset,$this->index->dataPostset);
+				$fixedFields=array_keys($this->index->dataPostset);
 				$code = '<table border="0" cellpadding="4" width="100%"><tr>
-					<td bgcolor="'.$this->pObj->doc->bgColor3dim.'">'.$this->getPresetForm($rec,$fixedFields,'tx_damindex_index.fixed_desc').'</td>
+					<td bgcolor="'.$cnBgColor.'">'.$this->getPresetForm($rec,$fixedFields,'tx_damindex_index.fixed_desc').'</td>
 					</tr></table>';
 				$content.= $this->pObj->doc->section('',$code,0,1);
 			break;
@@ -301,46 +267,42 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 			//
 			// setup summary
-			//
-
+			//			
+			
 			case 'index4':
-
-				$step = 4;
-
+			
+			
 					// JavaScript
 				$this->pObj->doc->JScode = $this->pObj->doc->wrapScriptTags('
 					function showProgress() {
-
+					
 						if(document.all) {
 							document.all.stepsFormButtons.style.visibility = "hidden";
 							document.all.summaryInfoDiv.style.visibility = "hidden";
+							document.all.progressInfoDiv.style.visibility = "visible";
 						} else {
 							document.getElementById("stepsFormButtons").style.visibility = "hidden";
 							document.getElementById("summaryInfoDiv").style.visibility = "hidden";
+							document.getElementById("progressInfoDiv").style.visibility = "visible";
 						}
 					}
-				');
-
-
-				$content.= $this->pObj->getPathInfoHeaderBar($this->pObj->pathInfo, FALSE, $this->cmdIcons);
+				');			
+			
+		
+				$content.= $this->pObj->getPathInfoHeaderBar($this->pObj->path, $FILEMOUNTS[$this->pObj->fmountID], FALSE, $this->cmdIcons);
 				$content.= $this->pObj->doc->spacer(10);
+				
+				$content.= $this->pObj->doc->section($LANG->getLL('tx_damindex_index.setup_summary'),$this->getStepsBar($step,$lastStep=4),0,1);
 
-				$content.= $description;
-
-				$header = $header ? $header : $LANG->getLL('tx_damindex_index.setup_summary');
-
-				$stepsBar = $this->getStepsBar($step,$lastStep, '' ,'showProgress();return true;', '', $LANG->getLL('tx_damindex_index.start'));
-				$content.= $this->pObj->doc->section($header,$stepsBar,0,1);
-
+				$content.= '<div id="progressInfoDiv" style="visibility:hidden"><img src="'.$BACK_PATH.PATH_txdam_rel.'i/progress_ani.gif" border="0" align="absmiddle">Indexing in progress. Please wait ...</div>';
 				$content.= '<div id="summaryInfoDiv">';
-				$content.= '<strong>'.$LANG->getLL('tx_damindex_index.set_options').'</strong><table border="0" cellspacing="0" cellpadding="4" width="100%">'.$this->index->getIndexingOptionsInfo().'</table>';
+				$content.= '<strong>Set Options:</strong><table border="0" cellspacing="0" cellpadding="4" width="100%">'.$this->index->getIndexingOptionsInfo().'</table>';
 
 				$content.= $this->pObj->doc->spacer(10);
 
-				$rec = array_merge($this->index->dataPreset,$this->index->dataPostset);
-
+				$rec=array_merge($this->index->dataPreset,$this->index->dataPostset);
 				$fixedFields=array_keys($this->index->dataPostset);
-				$content.= '<strong>'.$LANG->getLL('tx_damindex_index.meta_data_preset').'</strong><br /><table border="0" cellpadding="4" width="100%"><tr><td bgcolor="'.$this->pObj->doc->bgColor3dim.'">'.
+				$content.= '<strong>Meta data preset:</strong><br /><table border="0" cellpadding="4" width="100%"><tr><td bgcolor="'.$cnBgColor.'">'.
 								$this->showPresetData($rec,$fixedFields).
 								'</td></tr></table>';
 
@@ -350,7 +312,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 //				$store->init('tx_damindex');
 //				$store->setStoreList('tx_damindex_indexSetup');
 //				$store->processStoreControl();
-// TODO getStoreControl
+//#TODO nicht zu sehen:
 //				if ($code = $store->getStoreControl('save')) {
 //					$this->content.= $this->pObj->doc->section($LANG->getLL('tx_damindex_index.store_preset'),$code,0,1);
 //					$this->content.=$this->pObj->doc->spacer(10);
@@ -362,140 +324,23 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 
 			case 'indexStart':
-				$this->cmdIcons['funcMenu'] = '<div id="btn_back" style="visibility:hidden">'.$this->pObj->btn_back(array('indexStep[1]'=>1)).'</div>';
-
-					// JavaScript
-				$this->pObj->doc->JScode = $this->pObj->doc->wrapScriptTags('
-					function progress_bar_update(intCurrentPercent) {
-						document.getElementById("progress_bar_left").style.width = intCurrentPercent+"%";
-						document.getElementById("progress_bar_left").innerHTML = intCurrentPercent+"&nbsp;%";
-
-						document.getElementById("progress_bar_left").style.background = "#448e44";
-						if(intCurrentPercent >= 100) {
-							document.getElementById("progress_bar_right").style.background = "#448e44";
-						}
-					}
-
-
-					function addTableRow(cells) {
-
-						document.getElementById("table1").style.visibility = "visible";
-
-						var tbody = document.getElementById("table1").getElementsByTagName("tbody")[0];
-						var row = document.createElement("TR");
-
-						row.style.backgroundColor = "'.$this->pObj->doc->bgColor4.'";
-
-						for (var cellId in cells) {
-							var tdCell = document.createElement("TD");
-							tdCell.innerHTML = cells[cellId];
-							row.appendChild(tdCell);
-						}
-						var header = document.getElementById("table1header");
-						var headerParent = header.parentNode;
-						headerParent.insertBefore(row,header.nextSibling);
-
-						// tbody.appendChild(row);
-						// tbody.insertBefore(row,document.getElementById("table1header"));
-					}
-
-					function setMessage(msg) {
-						var messageCnt = document.getElementById("message");
-						messageCnt.innerHTML = msg;
-					}
-
-					function finished() {
-						progress_bar_update(100);
-						document.getElementById("progress_bar_left").innerHTML = "'.$LANG->getLL('tx_damindex_index.finished',1).'";
-						document.getElementById("btn_back").style.visibility = "visible";
-					}
-				');
-
-
-				$content.= $this->pObj->getPathInfoHeaderBar($this->pObj->pathInfo, FALSE, $this->cmdIcons);
+				$this->cmdIcons['funcMenu'] = $this->pObj->btn_back(array('indexStep[1]'=>1));
+				$content.= $this->pObj->getPathInfoHeaderBar($this->pObj->path, $FILEMOUNTS[$this->pObj->fmountID], FALSE, $this->cmdIcons);
 				$content.= $this->pObj->doc->spacer(10);
-
-				$content.= $description;
 
 				$content.= $this->pObj->doc->section($LANG->getLL('tx_damindex_index.indexed_files'),'',0,1);
-				$content.= $this->pObj->doc->spacer(10);
+				$content.= $this->doIndex();
 
-				if(tx_dam::config_getValue('setup.debug')) {
-					$iframeSize = 'width="100%" height="300" border="1" scrolling="yes" frameborder="1"';
-				} else {
-					$iframeSize = 'width="0" height="0" border="0" scrolling="no" frameborder="0"';
-				}
-
-
-				$this->pObj->addParams['doIndexing'] = 1;
-				$code = '';
-				$code.= '
-					<table width="300px" border="0" cellpadding="0" cellspacing="0" id="progress_bar" summary="progress_bar" align="center" style="border:1px solid #888">
-					<tbody>
-					<tr>
-					<td id="progress_bar_left" width="0%" align="center" style="background:#eee; color:#fff">&nbsp;</td>
-					<td id="progress_bar_right" style="background:#eee;">&nbsp;</td>
-					</tr>
-					</tbody>
-					</table>
-
-					<iframe src="'.htmlspecialchars(t3lib_div::linkThisScript($this->pObj->addParams)).'" name="indexiframe" '.$iframeSize.'>
-					Error!
-					</iframe>
-					<br />
-				';
-
-				if ($this->index->ruleConf['tx_damindex_rule_dryRun']['enabled']) {
-					$code.= '<div><strong class="diff-r">'.$LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.xml:dryRun.title').'!</strong></div>';
-				}
-
-				$code.= '
-					 <div id="message"></div>
-					 <table id="table1" style="visibility:hidden" cellpadding="1" cellspacing="1" border="0" width="100%">
-					 <tr id="table1header" class="bgColor5">
-						 <th>&nbsp;</th>
-						 <th>'.$LANG->sL('LLL:EXT:dam/locallang_db.xml:tx_dam_item.file_name',1).'</th>
-						 <th>'.$LANG->sL('LLL:EXT:dam/locallang_db.xml:tx_dam_item.file_type',1).'</th>
-						 <th>'.$LANG->sL('LLL:EXT:dam/locallang_db.xml:tx_dam_item.abstract',1).'</th>
-						 <th>'.$LANG->sL('LLL:EXT:dam/locallang_db.xml:tx_dam_item.file_path',1).'</th>
-					</tr>
-					</table>
-				';
-				$content.= $this->pObj->doc->section('',$code,0,1);
-			break;
-
-
-			case 'doIndexing':
-
-				$this->pObj->addParams['doIndexing'] = 1;
-
-					// reload at this time
-				$max_execution_time = ini_get('max_execution_time');
-				$max_execution_time = intval(($max_execution_time/3)*2);
-				$this->indexEndtime = time()+$max_execution_time;
-
-				echo '<head>
-					<title>indexing</title>
-					<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-					</head>
-					<body>';
-
-					$this->doIndexing(t3lib_div::_GP('indexSessionID'));
-
-				echo '</body>
-					</html>';
-				exit;
 			break;
 
 
 			//
 			// services info
-			//
-
+			//			
+			
 			case 'info':
-				#$content.= $this->pObj->doc->section('',$this->pObj->doc->funcMenu('',$this->cmdIcons['funcMenu']));
-				$content.= $this->pObj->getHeaderBar('', implode('<span class="spacer2em"><span>',$this->cmdIcons));
-
+				$content.= $this->pObj->doc->section('',$this->pObj->doc->funcMenu('',$this->cmdIcons['funcMenu']));
+				
 				$code='';
 
 				require_once (PATH_txdam.'lib/class.tx_dam_svlist.php');
@@ -512,12 +357,6 @@ class tx_damindex_index extends t3lib_extobjbase {
 				$code.= 'The "External" column shows which external programs are needed. If a service is not available, it might be the case that the program is not installed or can\'t be executed.<br />';
 
 				$content.= $this->pObj->doc->section('Available services for indexing:',$code,0,1);
-
-				$code='';
-				$code.= $list->showSearchPaths();
-				if($code) {
-					$content.= $this->pObj->doc->section('Configured search paths for external programs:',$code,0,1);
-				}
 			break;
 		}
 
@@ -527,7 +366,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 	}
 
 
-
+	
 
 
 	/*******************************************************
@@ -535,20 +374,19 @@ class tx_damindex_index extends t3lib_extobjbase {
 	 * Rendering the forms etc
 	 *
 	 *******************************************************/
-
-
+	 
+	 	 
 	/**
 	 * Returns the form to preset values
-	 *
-	 * @param	array		$rec preset record data
-	 * @param	array		$fixedFields fields which are preset as fixed fields
-	 * @param	string		$langKeyDesc Language key for description. Will be resolved with $LANG->getLL().
-	 * @return	string
+	 * 
+	 * @param	array		preset record data
+	 * @param	array		fields which are preset as fixed fields
+	 * @param	[type]		$langKeyDesc: ...
+	 * @return	string		
 	 * @params  string
 	 */
-	function getPresetForm ($rec, $fixedFields, $langKeyDesc) {
+	function getPresetForm ($rec,$fixedFields,$langKeyDesc) {
 		global $LANG, $BACK_PATH, $TCA;
-
 
 		$content = '';
 		$editForm = '';
@@ -556,26 +394,26 @@ class tx_damindex_index extends t3lib_extobjbase {
 		if(!is_array($rec)) $rec = array();
 		if(!is_array($fixedFields)) $fixedFields = array();
 
+			// fake table - to be safe
+		t3lib_div::loadTCA('tx_dam');
+		$TCA['tx_dam_simpleforms'] = $TCA['tx_dam'];
+
 		require_once (PATH_txdam.'lib/class.tx_dam_simpleforms.php');
 		$form = t3lib_div::makeInstance('tx_dam_simpleForms');
 		$form->initDefaultBEmode();
-		$form->setVirtualTable('tx_dam_simpleforms', 'tx_dam');
 		$form->removeRequired($TCA['tx_dam_simpleforms']);
-		$form->removeTreeViewBrowseable($TCA['tx_dam_simpleforms']);
 		$form->removeMM($TCA['tx_dam_simpleforms']);
-		$form->tx_dam_fixedFields = $fixedFields;
-
-// this is not needed, is it?
-//		require_once (PATH_t3lib.'class.t3lib_transferdata.php');
-//		$processData = t3lib_div::makeInstance('t3lib_transferData');
-//		$rec = $processData->renderRecordRaw('tx_dam', $rec['uid'], $rec['pid'], $rec);
-
+		$form->tx_dam_fixedFields=$fixedFields;
+		
+		require_once (PATH_t3lib.'class.t3lib_transferdata.php');
+		$processData = t3lib_div::makeInstance('t3lib_transferData');
+		$rec = $processData->renderRecordRaw('tx_dam_simpleforms', $rec['uid'], $rec['pid'], $rec);
 		$rec['uid'] = 1;
 		$rec['pid'] = 0;
-		$rec['media_type'] = TXDAM_mtype_undefined;
+		$rec['media_type'] = 0;
 
 
-		$columnsOnly = $TCA['tx_dam_simpleforms']['txdamInterface']['index_fieldList'];
+		$columnsOnly=$TCA['tx_dam_simpleforms']['txdamInterface']['index_fieldList'];
 
 		if ($columnsOnly)	{
 			$editForm.= $form->getListedFields('tx_dam_simpleforms',$rec,$columnsOnly);
@@ -583,17 +421,16 @@ class tx_damindex_index extends t3lib_extobjbase {
 			$editForm.= $form->getMainFields('tx_dam_simpleforms',$rec);
 		}
 
-
 			// add message for checkboxes
 		$editForm='<tr bgcolor="'.$this->pObj->doc->bgColor4.'">
 				<td nowrap="nowrap" valign="middle">'.
-				'<span style="padding: 0 10px 0 10px">'.
-				'<img'.t3lib_iconWorks::skinImg($GLOBALS['BACK_PATH'], 'gfx/pil2down.gif', 'width="12" height="7"').' alt="" />'.
-				'</span></td>
+				'<img src="clear.gif" width="7" height="10" alt="" />'.
+				'<img src="'.$BACK_PATH.'gfx/pil2down.gif" width="12" height="7" vspace="2" alt="" />'.
+				'<img src="clear.gif" width="10" height="10" alt="" /></td>
 				<td valign="top">'.$LANG->getLL($langKeyDesc).'</td>
 			</tr>
 			<tr>
-				<td colspan="2" style="height:8px"><span></span></td>
+				<td colspan="2"><img src="clear.gif" width="1" height="8" alt="" /></td>
 			</tr>'.
 			$editForm;
 
@@ -604,7 +441,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 		'.$form->printNeededJSFunctions_top();
 		$content.= $editForm.$form->printNeededJSFunctions();
 
-		$form->removeVirtualTable('tx_dam_simpleforms');
+		unset($TCA['tx_dam_simpleforms']);
 
 		return $content;
 	}
@@ -612,10 +449,10 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 	/**
 	 * Returns the non-editable form of preset values
-	 *
+	 * 
 	 * @param	array		preset record data
 	 * @param	array		fields which are preset as fixed fields
-	 * @return	string
+	 * @return	string		
 	 */
 	function showPresetData ($rec,$fixedFields) {
 		global $LANG, $BACK_PATH, $TCA;
@@ -624,25 +461,25 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 		if(!is_array($rec)) $rec = array();
 
-
+			// fake table - to be safe
+		t3lib_div::loadTCA('tx_dam');
+		$TCA['tx_dam_simpleforms'] = $TCA['tx_dam'];
+		
 		require_once (PATH_txdam.'lib/class.tx_dam_simpleforms.php');
 		$form = t3lib_div::makeInstance('tx_dam_simpleForms');
 		$form->initDefaultBEmode();
-		$form->setVirtualTable('tx_dam_simpleforms', 'tx_dam');
 		$form->prependFormFieldNames='ignore';
 		$form->removeRequired($TCA['tx_dam_simpleforms']);
 		$form->removeMM($TCA['tx_dam_simpleforms']);
 		$form->setNonEditable($TCA['tx_dam_simpleforms']);
-		$form->tx_dam_fixedFields = $fixedFields;
+		$form->tx_dam_fixedFields=$fixedFields;
 
-// this is not needed, is it?
-//		require_once (PATH_t3lib.'class.t3lib_transferdata.php');
-//		$processData = t3lib_div::makeInstance('t3lib_transferData');
-//		$rec = $processData->renderRecordRaw('tx_dam', $rec['uid'], $rec['pid'], $rec);
-
+		require_once (PATH_t3lib.'class.t3lib_transferdata.php');
+		$processData = t3lib_div::makeInstance('t3lib_transferData');
+		$rec = $processData->renderRecordRaw('tx_dam_simpleforms', $rec['uid'], $rec['pid'], $rec);
 		$rec['uid'] = 1;
 		$rec['pid'] = 0;
-		$rec['media_type'] = TXDAM_mtype_undefined;
+		$rec['media_type'] = 0;
 
 		$columnsOnly=$TCA['tx_dam']['txdamInterface']['index_fieldList'];
 
@@ -654,253 +491,88 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 		$content = $form->wrapTotal($content, $rec, 'tx_dam_simpleforms');
 
-		$form->removeVirtualTable('tx_dam_simpleforms');
+		unset($TCA['tx_dam_simpleforms']);
 
 		return $content;
 	}
 
 
-
-
-
-
-
-
 	/**
 	 * Do the file indexing
 	 * Read files from a directory index them and output a result table
-	 *
+	 * 
 	 * @return	string		HTML content
 	 */
-	function doIndexing($indexSessionID) {
-		global $LANG, $TYPO3_CONF_VARS;
-
-
-			// makes sense? Was a hint on php.net
-		ob_end_flush();
-
-			// get session data - which might have left files stored
-		$indexSession = $this->indexSessionFetch();
-
-		if($indexSessionID=='' OR !isset($indexSession['ID']) OR !($indexSession['ID']==$indexSessionID) OR $indexSession['currentCount']==0 ) {
-
-			$code = $LANG->getLL('tx_damindex_index.search_files');
-			$this->indexing_setMessage($code);
-			$this->indexing_flushNow();
-
-				// TODO fetching file names is still without callback - billions of files will cause a timeout - ever?
-			$filesTodo = $this->index->collectFiles($this->pObj->path, $this->index->ruleConf['tx_damindex_rule_recursive']['enabled']);
-			$indexSession = $this->indexSessionNew($filesTodo);
-
-		} else {
-			$this->index->stat = $indexSession['indexStat'];
-			$this->index->infoList = is_array($indexSession['infoList']) ? $indexSession['infoList'] : array();
-		}
-
-		if(tx_dam::config_getValue('setup.debug')) {
-			t3lib_div::print_array($indexSession);
-		}
+	function doIndex() {
+		global $LANG;
+		
+		$content = '';
 
 		$this->index->setDryRun($this->index->ruleConf['tx_damindex_rule_dryRun']['enabled']);
 
-		if ($indexSession['totalFilesCount']) {
+		set_time_limit(60*5);
+
+		$code='';
+		$ctable=array();
+		$irow=1;
+		# $ctable[$irow][] = 'Title';
+		$ctable[$irow][] = 'File';
+		$ctable[$irow][] = 'Path';
+		$ctable[$irow][] = 'Type';
+		$ctable[$irow][] = 'Text Excerpt';
+
+		$files = $this->index->getFilesInDir($this->pObj->path, $this->index->ruleConf['tx_damindex_rule_recursive']['enabled']);
+
+		if (count($files)) {
 
 			$this->index->collectMeta = TRUE;
 			$this->index->enableReindexing($this->index->ruleConf['tx_damindex_rule_doReindexing']['enabled']);
-			$this->index->setIndexRun($indexSession['indexRun']);
-			$this->index->setRunType('man');
-			$this->index->indexFiles($indexSession['filesTodo'], $this->pObj->defaultPid, array(&$this, 'doIndexingCallback'));
+			$this->index->indexFiles($files, $this->pObj->defaultPid);
 
-			if (!$this->index->stat['totalCount']) {
-				$code = $LANG->getLL('tx_damindex_index.no_new_files');
-				$this->indexing_setMessage($code);
+			foreach($this->index->meta as $id => $val) {
+				$meta = $val['fields'];
+				if(is_array($meta)) {
+					# $ctable[++$irow][] = t3lib_div::fixed_lgd_cs($meta['title'],30);
+					$ctable[++$irow][] = t3lib_div::fixed_lgd_cs($meta['file_name'],25);
+					$ctable[$irow][] = t3lib_div::fixed_lgd_cs($meta['file_path'],-20);
+					$ctable[$irow][] = tx_dam_div::fileIcon ($meta['file_type'],$meta['media_type'],$tparams='align="top"').'&nbsp;'.$meta['file_type'];
+					$ctable[$irow][] = t3lib_div::fixed_lgd_cs($meta['abstract'],18);
+				}
 			}
-			$this->indexing_finished();
 
+			if ($this->index->stat['totalCount'] > 0) {
+				$this->pObj->doc->tableLayout = Array (
+					'table' => Array('<table cellpadding="3" cellspacing="1" border="0" width="100%">','</table>'),
+					'0' => Array (
+						'tr' => Array('<tr bgcolor="'.$this->pObj->doc->bgColor5.'">','</tr>'),
+						'defCol' => Array('<td valign="top" nowrap="nowrap"><strong>','</strong></td>')
+					),
+					'defRowOdd' => Array (
+						'defCol' => Array('<td valign="top" nowrap="nowrap" bgcolor="'.$this->pObj->doc->bgColor4.'">','</td>'),
+						'3' => Array('<td valign="top" bgcolor="'.$this->pObj->doc->bgColor4.'">','</td>'),
+						'4' => Array('<td valign="top" bgcolor="'.$this->pObj->doc->bgColor4.'">','</td>')
+					),
+					'defRowEven' => Array (
+						'defCol' => Array('<td valign="top" nowrap="nowrap" bgcolor="'.$this->pObj->doc->bgColor3.'">','</td>'),
+						'3' => Array('<td valign="top" bgcolor="'.$this->pObj->doc->bgColor3.'">','</td>'),
+						'4' => Array('<td valign="top" bgcolor="'.$this->pObj->doc->bgColor3.'">','</td>')
+					)
+				);
+				if ($this->index->ruleConf['tx_damindex_rule_dryRun']['enabled']) {
+					$code.= '<div><strong class="diff-r">'.$LANG->sL('LLL:EXT:dam_index/lib/locallang_indexrules.php:dryRun.title').'!</strong></div>';
+				}
+				$code.= '<br />'.$this->index->stat['totalCount'].' files indexed';
+				$code.= ' in '.max(1,ceil($this->index->stat['totalTime']/1000)).' sec.';
+				$code.= $this->pObj->doc->table($ctable);
+				$content.= $this->pObj->doc->section('',$code,0,1);
+			} else {
+				$content.= $this->pObj->doc->section('','<br />'.'There are no <b>new</b> files to index',0,1);
+			}
 		} else {
-			$code = $LANG->getLL('tx_damindex_index.no_files');
-			$this->indexing_setMessage($code);
+			$content.= $this->pObj->doc->section('','<br />'.'There are no files to index',0,1);
 
 		}
-
-			// finished - clear session
-		$this->indexSessionClear();
-	}
-
-
-	/**
-	 *
-	 */
-	function doIndexingCallback($type, $meta, $absFile, $fileArrKey, &$pObj) {
-		global $LANG, $TYPO3_CONF_VARS;
-
-			// get session data
-		$indexSession = $this->indexSessionFetch();
-
-			// increase progress bar
-		$indexSession['currentCount']++;
-
-		if(is_array($meta) AND is_array($meta['fields'])) {
-
-			if(tx_dam::config_getValue('setup.debug')) {
-				t3lib_div::print_array(array(
-						'file_name' => $meta['fields']['file_name'],
-					));
-			}
-
-			$ctable = array();
-			$ctable[] = $GLOBALS['SOBE']->btn_editRec_inNewWindow('tx_dam', $meta['fields']['uid']);
-			$ctable[] = '<span style="white-space:nowrap;">'.tx_dam::icon_getFileTypeImgTag($meta['fields'],'align="top"').'&nbsp;'.htmlspecialchars(t3lib_div::fixed_lgd_cs($meta['fields']['file_name'],23)).'</span>';
-			$ctable[] = strtoupper($meta['fields']['file_type']);
-			$ctable[] = '<span style="white-space:nowrap;">'.htmlspecialchars(str_replace("\n", ' ', t3lib_div::fixed_lgd_cs($meta['fields']['abstract'],14))).'</span>';
-			$ctable[] = htmlspecialchars(t3lib_div::fixed_lgd_cs($meta['fields']['file_path'],-15));
-
-			$this->indexing_addTableRow($ctable);
-			$msg = $LANG->getLL('tx_damindex_index.indexed_message',1);
-			$code = sprintf($msg, $this->index->stat['totalCount'], max(1,ceil($this->index->stat['totalTime']/1000)));
-			$this->indexing_setMessage($code);
-		}
-
-		$this->indexing_progressBar($indexSession['currentCount'], $indexSession['totalFilesCount']);
-		$this->indexing_flushNow();
-
-			// one step further - save session data
-		unset($indexSession['filesTodo'][$fileArrKey]);
-		$indexSession['indexStat'] = $this->index->stat;
-		$indexSession['infoList'] =	$this->index->infoList;
-
-		$this->indexSessionWrite($indexSession);
-
-		if (($this->indexEndtime < time()) AND ($indexSession['currentCount'] < $indexSession['totalFilesCount'])) {
-			$params = $this->pObj->addParams;
-			$params['indexSessionID'] = $indexSession['ID'];
-			echo '
-				<script type="text/javascript">  window.location.href = unescape("'.t3lib_div::rawUrlEncodeJS(tx_dam_SCbase::linkThisScriptStraight($params)).'"); </script>';
-			exit;
-		}
-	}
-
-
-
-
-
-
-	/**
-	 *
-	 */
-	function indexing_progressBar($intCurrentCount = 100, $intTotalCount = 100) {
-
-		static $intNumberRuns = 0;
-		static $intDisplayedCurrentPercent = 0;
-		$strProgressBar = '';
-		$dblPercentIncrease = (100 / $intTotalCount);
-		$intCurrentPercent = intval($intCurrentCount * $dblPercentIncrease);
-		$intNumberRuns ++;
-
-		if (($intNumberRuns>1) AND ($intDisplayedCurrentPercent <> $intCurrentPercent))  {
-			$intDisplayedCurrentPercent = $intCurrentPercent;
-			$strProgressBar = '
-				<script type="text/javascript" language="javascript"> parent.progress_bar_update('.$intCurrentPercent.'); </script>';
-		}
-		echo $strProgressBar;
-	}
-
-
-	/**
-	 *
-	 */
-	function indexing_addTableRow($contentArr) {
-		foreach ($contentArr as $key => $val) {
-			$contentArr[$key] = t3lib_div::slashJS($val, false, '"');
-		}
-		$jsArr = '"'.implode('","', $contentArr).'"';
-		$jsArr = 'new Array('.$jsArr.')';
-		echo '
-			<script type="text/javascript" language="javascript"> parent.addTableRow('.$jsArr.');</script>';
-	}
-
-
-	/**
-	 *
-	 */
-	function indexing_setMessage($msg) {
-		echo '
-			<script type="text/javascript" language="javascript"> parent.setMessage("'.t3lib_div::slashJS($msg, false, '"').'")</script>';
-	}
-
-
-	/**
-	 *
-	 */
-	function indexing_finished() {
-		echo '
-			<script type="text/javascript" language="javascript"> parent.finished()</script>';
-	}
-
-
-	/**
-	 *
-	 */
-	function indexing_flushNow() {
-		flush();
-		ob_flush();
-	}
-
-
-
-
-
-
-	/*******************************************************
-	 *
-	 * indexSession
-	 *
-	 *******************************************************/
-
-
-	/**
-	 * Clears the index session
-	 *
-	 * @return void
-	 */
-	function indexSessionClear() {
-		$this->indexSessionWrite(array());
-	}
-
-
-	/**
-	 * Creates new index session and returns the data
-	 *
-	 * @return mixed
-	 */
-	function indexSessionNew($filesTodo) {
-		$indexSession = array();
-		$indexSession['filesTodo'] = $filesTodo;
-		$indexSession['ID'] = uniqid('tx_dam_damindex_index');
-		$indexSession['indexRun'] = time();
-		$indexSession['currentCount'] = 0;
-		$indexSession['totalFilesCount'] = count($filesTodo);
-		$this->indexSessionWrite($indexSession);
-		return $indexSession;
-	}
-
-
-	/**
-	 * Returns the index session data
-	 *
-	 * @return mixed
-	 */
-	function indexSessionFetch() {
-		return $GLOBALS['BE_USER']->getSessionData('tx_damindexSessionData');
-	}
-
-	/**
-	 * Writes the index session
-	 *
-	 * @return void
-	 */
-	function indexSessionWrite($indexSession) {
-		$GLOBALS['BE_USER']->setAndSaveSessionData('tx_damindexSessionData', $indexSession);
+		return $content;
 	}
 
 
@@ -912,23 +584,21 @@ class tx_damindex_index extends t3lib_extobjbase {
 	 * GUI
 	 *
 	 *******************************************************/
-
-
+	 
+	 
+	 
 	/**
 	 * Returns HTML of a box with a step counter and "back" and "next" buttons
-	 *
+	 * 
 	 * @param	integer		current step (begins with 1)
 	 * @param	integer		last step
-	 * @return	string
+	 * @return	string		
 	 */
-	function getStepsBar($currentStep, $lastStep, $onClickBack='' ,$onClickFwd='', $buttonNameBack='', $buttonNameFwd='') {
+	function getStepsBar($currentStep,$lastStep=4) {
 		global $LANG;
 
 		$bgcolor = t3lib_div::modifyHTMLcolor($this->pObj->doc->bgColor,-15,-15,-15);
 		$nrcolor = t3lib_div::modifyHTMLcolor($bgcolor,30,30,30);
-
-		$buttonNameBack = $buttonNameBack ? $buttonNameBack : $LANG->getLL('tx_damindex_index.back');
-		$buttonNameFwd = $buttonNameFwd ? $buttonNameFwd : $LANG->getLL('tx_damindex_index.next');
 
 		$content='';
 		$buttons='';
@@ -940,14 +610,17 @@ class tx_damindex_index extends t3lib_extobjbase {
 		$content = '<span style="margin-left:50px; margin-right:25px; vertical-align:middle; font-family:Verdana,Arial,Helvetica; font-size:22px; font-weight:bold;">'.$content.'</span>';
 
 		if($currentStep > 1) {
-			$buttons.= '<input type="submit" name="indexStep['.($currentStep-1).']" onclick="'.htmlspecialchars($onClickBack).'" value="'.htmlspecialchars($buttonNameBack).'" style="margin-right:10px;" />';
+			$buttons.= '<input type="submit" name="indexStep['.($currentStep-1).']" value="'.$LANG->getLL('tx_damindex_index.back').'" style="margin-right:10px;" />';
 		}
-
-
+if($currentStep==3){
+$onClick='return TBE_EDITOR_checkSubmit(1);';
+$onClick=' onclick="'.htmlspecialchars($onClick).'"';
+}		
 		if($currentStep < $lastStep) {
-			$buttons.= '<input type="submit" name="indexStep['.($currentStep+1).']" onclick="'.htmlspecialchars($onClickFwd).'" value="'.htmlspecialchars($buttonNameFwd).'" />';
+			$buttons.= '<input type="submit" name="indexStep['.($currentStep+1).']"'.$onClick.' value="'.$LANG->getLL('tx_damindex_index.next').'" />';
 		} else {
-			$buttons.= '<input type="submit" name="indexStart" value="'.htmlspecialchars($buttonNameFwd).'" onclick="'.htmlspecialchars($onClickFwd).'" style="font-weight:bold;background-color: #6b6;" />';
+			$onClick='showProgress();return true;';
+			$buttons.= '<input type="submit" name="indexStart" value="'.$LANG->getLL('tx_damindex_index.start').'" onclick="'.htmlspecialchars($onClick).'" style="font-weight:bold;background-color: #6b6;" />';
 		}
 		$content.= '<span id="stepsFormButtons" style="margin-left:25px;vertical-align:middle;">'.$buttons.'</span>';
 
@@ -963,14 +636,14 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 	/**
 	 * Processes the submitted data for the indexing setup
-	 *
+	 * 
 	 * @return	void
 	 */
 	function processIndexSetup()	{
-		global  $BE_USER, $LANG, $BACK_PATH;
-
+		global $SOBE, $BE_USER, $LANG, $BACK_PATH;
+		
 			// get stored indexing setup from last page view or last session
-		$storedSetup = unserialize($GLOBALS['SOBE']->MOD_SETTINGS['tx_damindex_indexSetup']);
+		$storedSetup = unserialize($SOBE->MOD_SETTINGS['tx_damindex_indexSetup']);
 		if(is_array($storedSetup['ruleConf'])) {
 			$this->index->ruleConf = t3lib_div::array_merge_recursive_overrule($this->index->ruleConf, $storedSetup['ruleConf']);
 		}
@@ -981,15 +654,14 @@ class tx_damindex_index extends t3lib_extobjbase {
 			$this->index->dataPostset = t3lib_div::array_merge_recursive_overrule($this->index->dataPostset, $storedSetup['dataPostset']);
 		}
 
+
 			// merging values to the current indexing setup
 		$data = t3lib_div::_POST('data');
 
 		if (is_array($data['rules'])) {
 			$this->index->mergeRuleConf($data['rules']);
-		} else {
-			$this->index->mergeRuleConf();
 		}
-
+			
 
 			// preset form
 		if (is_array($data['tx_dam_simpleforms'][1])) {
@@ -1012,54 +684,57 @@ class tx_damindex_index extends t3lib_extobjbase {
 				}
 			}
 		}
+		#debug($this->index->ruleConf, 'ruleConf', __LINE__, __FILE__);
+		#debug($this->index->dataPreset, 'dataPreset', __LINE__, __FILE__);
+		#debug($this->index->dataPostset, 'dataPostset', __LINE__, __FILE__);
 
 		$this->saveSettings();
 	}
 
 	/**
-	 * Save preset in module settings
-	 *
-	 * @return	void
+	 * [Describe function...]
+	 * 
+	 * @return	[type]		...
 	 */
 	function saveSettings() {
+		global $SOBE;
+		
+		
 		$setup = array(
 			'ruleConf' => $this->index->ruleConf,
 			'dataPreset' => $this->index->dataPreset,
 			'dataPostset' => $this->index->dataPostset,
 			);
-
+		
 		$newSettings = array(
 			'tx_damindex_indexSetup' => serialize($setup),
 			'tx_dam_folder' => $this->pObj->path,
 		);
-		$GLOBALS['SOBE']->MOD_SETTINGS = t3lib_BEfunc::getModuleData($GLOBALS['SOBE']->MOD_MENU, $newSettings, $GLOBALS['SOBE']->MCONF['name'], $GLOBALS['SOBE']->modMenu_type, $GLOBALS['SOBE']->modMenu_dontValidateList, $GLOBALS['SOBE']->modMenu_setDefaultList);
+		$SOBE->MOD_SETTINGS = t3lib_BEfunc::getModuleData($SOBE->MOD_MENU, $newSettings, $SOBE->MCONF['name'], $SOBE->modMenu_type, $SOBE->modMenu_dontValidateList, $SOBE->modMenu_setDefaultList);
 	}
-
-
-
 
 
 	/**
-	 * Modifies values posted during the indexing process from step 3 to step 4
-	 * Used to display selected Categories in step 4
-	 *
+	 * Creates a browsable file/folder list
+	 * 
+	 * @param	string		Path
 	 * @param	string		Path
 	 * @return	string		Output
-	 * @deprecated version - 10.04.2006
-	 * @todo remove this - is no longer used!?
 	 */
-	function modifyValuesForDisplay ($rec) {
-		$tmp = array();
-		if ($rec['category'] AND !strpos($rec['category'],'|')) {
-			$cats = implode(',',t3lib_div::trimExplode(',',$rec['category'],1));
-			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid,title','tx_dam_cat','uid IN ('.$cats.')');
-			while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-				$tmp[] = $row['uid'].'|'.$row['title'];
-			}
-			$rec['category'] = implode(',',$tmp);
-		}
-		return $rec;
-	}
+	function getBrowseableFolderList ($path, $folderParam) {
+		global $LANG, $FILEMOUNTS;
+		
+		$content = '';
+		
+		$filelist = t3lib_div::makeInstance('tx_dam_fileList');
+		$filelist->folderParam = $folderParam;
+		#$content.= $this->pObj->getPathInfoHeaderBar($this->pObj->path, $FILEMOUNTS[$this->pObj->fmountID], TRUE, '', 'up,refresh');
+		$content.= $filelist->getBrowseableFolderList($path, TRUE);
+		
+		$cnBgColor = t3lib_div::modifyHTMLcolor($this->pObj->doc->bgColor3,-5,-5,-5);
+		$content = '<div style="width:100%;background-color:'.$cnBgColor.'">'.$content.'</div>';
+		return $content;
+	}	
 
 
 }

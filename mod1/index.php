@@ -2,7 +2,7 @@
 /***************************************************************
 *  Copyright notice
 *
-*  (c) 2003-2006 Rene Fritz (r.fritz@colorcube.de)
+*  (c) 2003-2004 René Fritz (r.fritz@colorcube.de)
 *  All rights reserved
 *
 *  This script is part of the Typo3 project. The Typo3 project is
@@ -25,7 +25,7 @@
  * Module 'Media>Index'
  * Part of the DAM (digital asset management) extension.
  *
- * @author	Rene Fritz <r.fritz@colorcube.de>
+ * @author	René Fritz <r.fritz@colorcube.de>
  * @package TYPO3
  * @subpackage tx_dam_index
  */
@@ -34,12 +34,12 @@
  *
  *
  *
- *   74: class tx_damindex_module1 extends tx_dam_SCbase
- *   94:     function init()
- *  143:     function menuConfig()
- *  158:     function main()
- *  196:     function jumpToUrl(URL)
- *  257:     function printContent()
+ *   74: class tx_damindex_module1 extends tx_dam_SCbase 
+ *   94:     function init()	
+ *  143:     function menuConfig()	
+ *  158:     function main()	
+ *  196:     function jumpToUrl(URL)	
+ *  257:     function printContent()	
  *
  * TOTAL FUNCTIONS: 5
  * (This index is automatically created/updated by the extension "extdeveval")
@@ -52,15 +52,14 @@
 
 
 
-unset($MCONF);
+unset($MCONF);	
 require ('conf.php');
 require ($BACK_PATH.'init.php');
 require ($BACK_PATH.'template.php');
 
 require_once(PATH_txdam.'lib/class.tx_dam_scbase.php');
-require_once(PATH_txdam.'lib/class.tx_dam_guirenderlist.php');
 
-$LANG->includeLLFile('EXT:dam_index/mod1/locallang.xml');
+$LANG->includeLLFile('EXT:dam_index/mod1/locallang.php');
 
 
 $BE_USER->modAccess($MCONF,1);
@@ -72,48 +71,52 @@ require_once (PATH_t3lib.'class.t3lib_basicfilefunc.php');
 
 /**
  * Script class for the DAM index module
- *
- * @author	Rene Fritz <r.fritz@colorcube.de>
+ * 
+ * @author	René Fritz <r.fritz@colorcube.de>
  * @package TYPO3
  * @subpackage tx_dam_file
  */
 class tx_damindex_module1 extends tx_dam_SCbase {
-
+	
 	/**
 	 * t3lib_basicFileFunctions object
 	 */
-	var $basicFF;
-
+	var $basicFF;	
+	
+	
 
 	/**
 	 * Initializes the backend module
-	 *
-	 * @return	void
+	 * 
+	 * @return	void		
 	 */
 	function init()	{
-		global  $TYPO3_CONF_VARS, $FILEMOUNTS;
+		global $SOBE, $TYPO3_CONF_VARS, $FILEMOUNTS;
 
 		parent::init();
-
-
-			// Init guiRenderList object:
-
-		$this->guiItems = t3lib_div::makeInstance('tx_dam_guiRenderList');
-
-
-			// Init basic-file-functions object:
-
+		
+		
+		//
+		// Init basic-file-functions object:
+		//
+		
 		$this->basicFF = t3lib_div::makeInstance('t3lib_basicFileFunctions');
 		$this->basicFF->init($FILEMOUNTS,$TYPO3_CONF_VARS['BE']['fileExtensions']);
 
+
+		//
+		// Init misc
+		//
+
+		$this->initDB();	
 	}
 
-
-
+	
+	
 	/**
 	 * Main function of the module. Write the content to $this->content
-	 *
-	 * @return	void
+	 * 
+	 * @return	void		
 	 */
 	function main()	{
 		global $BE_USER, $LANG, $BACK_PATH, $FILEMOUNTS, $TYPO3_CONF_VARS;
@@ -125,26 +128,41 @@ class tx_damindex_module1 extends tx_dam_SCbase {
 		$this->doc = t3lib_div::makeInstance('mediumDoc');
 		$this->doc->backPath = $BACK_PATH;
 		$this->doc->docType = 'xhtml_trans';
+				
+				
+		//
+		// Validating the input path and checking access against the mounts of the user.
+		// 
+		
+		$this->path = $this->basicFF->is_directory(tx_dam_div::getAbsPath($this->path));
+		$this->path = $this->path ? $this->path.'/' : '';
+		$access = $this->path && ($this->fmountID = $this->basicFF->checkPathAgainstMounts($this->path));
+		$this->path_mount = $FILEMOUNTS[$this->fmountID]['path'];
+		
+//debug($this->MOD_SETTINGS['tx_dam_folder'], 'tx_dam_folder');
+//debug($this->path_mount, 'path_mount');
+//debug($this->path, 'path');
+//debug($FILEMOUNTS, '$FILEMOUNTS');
+//debug($this->fmountID, 'fmountID');
 
-
-
+			
 		//
 		// There was access to this file path, continue ...
 		//
-
-		if ($this->pathAccess)	{
-
+					
+		if ($access)	{
+			
 			//
 			// Output page header
 			//
 
-			$this->doc->form='<form action="'.htmlspecialchars(t3lib_div::linkThisScript($this->addParams)).'" method="post" name="editform" enctype="'.$TYPO3_CONF_VARS['SYS']['form_enctype'].'">';
+			$this->doc->form='<form action="'.t3lib_div::linkThisScript($this->addParams).'" method="POST" name="editform" enctype="'.$TYPO3_CONF_VARS['SYS']['form_enctype'].'">';
 
 				// JavaScript
 			$this->doc->JScodeArray['jumpToUrl'] = '
 				var script_ended = 0;
 				var changed = 0;
-
+				
 				function jumpToUrl(URL)	{
 					document.location = URL;
 				}
@@ -165,56 +183,55 @@ class tx_damindex_module1 extends tx_dam_SCbase {
 			//
 			// Output tabmenu if not a single function was forced
 			//
-
+			
 			if (!$this->forcedFunction AND count($this->MOD_MENU['function'])>1) {
+#TODO				$this->content.= $this->doc->section('',$this->doc->getTabMenu($this->addParams,'SET[function]',$this->MOD_SETTINGS['function'],$this->MOD_MENU['function']),0,1);
 				$this->content.= $this->doc->section('',$this->getTabMenu($this->addParams,'SET[function]',$this->MOD_SETTINGS['function'],$this->MOD_MENU['function']),0,1);
 			}
 
 			//
-			// Call submodule function
+			// Call submodule function  
 			//
-
+			
 			$this->extObjContent();
 
 
 			//
 			// output footer: search box, options, store control, ....
 			//
-
+				
 			$this->content.= $this->doc->spacer(10);
-			$this->content.= $this->guiItems->getOutput('footer');
-
-
+			$this->content.= $this->guiItems_getOutput('footer');
+		
+			
 			// ShortCut
 			if ($BE_USER->mayMakeShortcut())	{
+#TODO
 				$this->content.= $this->doc->spacer(20).$this->doc->section('',$this->doc->makeShortcutIcon('id',implode(',',array_keys($this->MOD_MENU)),$this->MCONF['name']));
 			}
-
+		
 			$this->content.= $this->doc->spacer(10);
-
+			
 		} else {
 				// If no access or no path
-
+		
 			$this->content.= $this->doc->startPage($LANG->getLL('title'));
 			$this->content.= $this->doc->header($LANG->getLL('title'));
 			$this->content.= $this->doc->spacer(5);
-			if($this->pathInfo) {
-				$this->content.= $this->doc->section('', $LANG->getLL('pathNoAccess'));
-			}
-			else {
-				$this->content.= $this->doc->section('', $LANG->getLL('pathNotExists'));
-			}
+#TODO
 			$this->content.= $this->doc->spacer(10);
 		}
 	}
-
+	
 
 	/**
 	 * Prints out the module HTML
-	 *
+	 * 
 	 * @return	string		HTML
 	 */
 	function printContent()	{
+		global $SOBE;
+
 		$this->content.= $this->doc->middle();
 		$this->content.= $this->doc->endPage();
 		$this->content = $this->doc->insertStylesAndJS($this->content);
@@ -242,7 +259,7 @@ while(list(,$INC_FILE)=each($SOBE->include_once))	{include_once($INC_FILE);}
 $SOBE->checkExtObj();	// Checking for first level external objects
 
 // Repeat Include files! - if any files has been added by second-level extensions
-reset($SOBE->include_once);
+reset($SOBE->include_once);	
 while(list(,$INC_FILE)=each($SOBE->include_once))	{include_once($INC_FILE);}
 $SOBE->checkSubExtObj();	// Checking second level external objects
 
