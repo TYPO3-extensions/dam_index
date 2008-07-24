@@ -72,7 +72,7 @@
             <label index="tx_damindex_index.index_begin">Neue Indexierung</label>
             <label index="tx_damindex_index.index_fields_preset">Indexierungsfelder Voreinstellung</label>
             <label index="tx_damindex_index.preset_desc">Standardwerte für Felder.&lt;br /&gt;Die Werte werden gegebenenfalls durch automatisch den Dateien entnommenen Werten ersetzt.</label>
-            <label index="tx_damindex_index.fixed_desc">Wählen Sie die Felder aus, bei denen Ihre Eingaben &lt;b&gt;in jedem Fall&lt;/b&gt; übernommen werden sollen. Ansonsten werden Ihre Eingaben ggf. während der Indexierung ersetzt.</label>
+            <label index="tx_damindex_index.fixed_desc">Wählen Sie die Felder aus, denen Sie Ihre Eingaben &lt;b&gt;anf&amp;uuml;gen&lt;/b&gt; wollen.&lt;br /&gt;Ansonsten ersetzen Ihre Eingaben die bereits vorhandenen Daten.</label>
             <label index="tx_damindex_index.setup_summary">Einstellung für die Indexierung</label>
             <label index="tx_damindex_index.indexed_files">Dateien indexieren:</label>
             <label index="tx_damindex_index.indexed_message">%s Dateien indexiert in %s sek.</label>

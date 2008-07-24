@@ -34,14 +34,15 @@
  *
  *
  *
- *   79: class tx_damindex_module1 extends tx_dam_SCbase
- *   92:     function init()
- *  117:     function main()
- *  147:     function jumpToUrl(URL)
- *  216:     function printContent()
+ *   74: class tx_damindex_module1 extends tx_dam_SCbase
+ *   94:     function init()
+ *  143:     function menuConfig()
+ *  158:     function main()
+ *  196:     function jumpToUrl(URL)
+ *  257:     function printContent()
  *
- * TOTAL FUNCTIONS: 4
- * (This index is automatically created/updated by the script "update-class-index")
+ * TOTAL FUNCTIONS: 5
+ * (This index is automatically created/updated by the extension "extdeveval")
  *
  */
 
