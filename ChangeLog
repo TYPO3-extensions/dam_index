@@ -1,3 +1,7 @@
+2008-09-20  Benjamin Mack  <benni@typo3.org>
+
+	* Updated version in ext_emconf.php to 1.1.0-dev
+
 2007-09-30  Michael Stucki  <michael@typo3.org>
 
 	* Takeover by the DAM development team
