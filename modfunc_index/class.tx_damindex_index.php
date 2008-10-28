@@ -100,23 +100,6 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 
 	/**
-	 * Function menu initialization
-	 *
-	 * @return	array		Menu array
-	 */
-	function modMenu()    {
-		global $LANG;
-
-		return array(
-			'tx_damindex_index_func' => array(
-				'index' => $LANG->getLL('tx_damindex_index.func_index'),
-				'info' => $LANG->getLL('tx_damindex_index.func_info'),
-			),
-		);
-	}
-
-
-	/**
 	 * Do some init things and aet some styles in HTML header
 	 *
 	 * @return	void
@@ -171,8 +154,6 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 		$content = '';
 
-		$this->cmdIcons['funcMenu'] = t3lib_BEfunc::getFuncMenu($this->pObj->addParams,'SET[tx_damindex_index_func]',$GLOBALS['SOBE']->MOD_SETTINGS['tx_damindex_index_func'],$GLOBALS['SOBE']->MOD_MENU['tx_damindex_index_func']);
-
 		#$content.= $this->pObj->getPathInfoHeaderBar($this->pObj->pathInfo, TRUE, $this->cmdIcons);
 		#$content.= $this->pObj->doc->section('',$this->pObj->doc->funcMenu('',$this->cmdIcons['funcMenu']));
 
@@ -185,7 +166,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 
 	function getCurrentFunc() {
-		$func = (string)$GLOBALS['SOBE']->MOD_SETTINGS['tx_damindex_index_func'];
+		$func = 'index';
 		if ($step = t3lib_div::_GP('indexStep')) {
 			$step = max(1,key($step));
 			$func = 'index'.$step;
@@ -487,39 +468,6 @@ class tx_damindex_index extends t3lib_extobjbase {
 				echo '</body>
 					</html>';
 				exit;
-			break;
-
-
-			//
-			// services info
-			//
-
-			case 'info':
-				#$content.= $this->pObj->doc->section('',$this->pObj->doc->funcMenu('',$this->cmdIcons['funcMenu']));
-				$content.= $this->pObj->getHeaderBar('', implode('<span class="spacer2em"><span>',$this->cmdIcons));
-
-				$code='';
-
-				require_once (PATH_txdam.'lib/class.tx_dam_svlist.php');
-				$list = t3lib_div::makeInstance('tx_dam_svlist');
-				$list->pObj = &$this->pObj;
-
-				$code.= 'Indexing needs the help of some services to extract meta data or read text content from the files.<br /><br />Used service types are:<br />';
-				$code.= '<strong>metaExtract</strong> - get meta data from files.<br />';
-				$code.= '<strong>textExtract</strong> - get text content out of files.<br />';
-				$code.= '<strong>textLang</strong> - detect the language of text content.<br />';
-
-				$code.= $list->serviceTypeList_loaded();
-
-				$code.= 'The "External" column shows which external programs are needed. If a service is not available, it might be the case that the program is not installed or can\'t be executed.<br />';
-
-				$content.= $this->pObj->doc->section('Available services for indexing:',$code,0,1);
-
-				$code='';
-				$code.= $list->showSearchPaths();
-				if($code) {
-					$content.= $this->pObj->doc->section('Configured search paths for external programs:',$code,0,1);
-				}
 			break;
 		}
 
