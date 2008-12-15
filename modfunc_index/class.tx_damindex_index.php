@@ -152,7 +152,9 @@ class tx_damindex_index extends t3lib_extobjbase {
 	function main()	{
 		global  $BE_USER, $LANG, $BACK_PATH;
 
-		$content = '';
+		//$content = '';
+
+		//$this->pObj->markers['FUNC_MENU'] = $this->pObj->getTabMenu($this->pObj->addParams,'SET[tx_damindex_index_func]',$GLOBALS['SOBE']->MOD_SETTINGS['tx_damindex_index_func'],$GLOBALS['SOBE']->MOD_MENU['tx_damindex_index_func']);
 
 		#$content.= $this->pObj->getPathInfoHeaderBar($this->pObj->pathInfo, TRUE, $this->cmdIcons);
 		#$content.= $this->pObj->doc->section('',$this->pObj->doc->funcMenu('',$this->cmdIcons['funcMenu']));
