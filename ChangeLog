@@ -1,3 +1,7 @@
+2009-05-19  Dan Osipov <dosipov@phillyburbs.com>
+
+	* Fixed #10627: Marker ###FOLDER### is not replaced
+	
 2008-12-26  Michiel Roos <michiel@netcreators.com>
 
 	* Setting version to 1.1.0
