@@ -456,7 +456,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 					// reload at this time
 				$max_execution_time = ini_get('max_execution_time');
-				$max_execution_time = intval(($max_execution_time/3)*2);
+                                $max_execution_time = intval($max_execution_time) ? intval(($max_execution_time/3)*2) : 60;
 				$this->indexEndtime = time()+$max_execution_time;
 
 				echo '<head>
