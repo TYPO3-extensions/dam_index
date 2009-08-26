@@ -1,3 +1,7 @@
+2009-08-26  Michiel Roos <michiel@netcreators.com>
+
+	* Fixed bug #10862: typo in german info-message (Thanks to Georg Ringer)
+
 2009-05-21  Dan Osipov <dosipov@phillyburbs.com>
 
 	* Fixed bug #10627: Marker ###FOLDER### is not replaced
