@@ -1,3 +1,7 @@
+2010-06-24  Dmitry Dulepov  <dmitry.dulepov@gmail.com>
+
+	* Fixed bug #14304: PHP Warnings while indexing files
+
 2009-08-26  Michiel Roos <michiel@netcreators.com>
 
 	* Fixed bug #10862: typo in german info-message (Thanks to Georg Ringer)
@@ -9,7 +13,7 @@
 2009-05-19  Dan Osipov <dosipov@phillyburbs.com>
 
 	* Fixed #10627: Marker ###FOLDER### is not replaced
-	
+
 2008-12-26  Michiel Roos <michiel@netcreators.com>
 
 	* Setting version to 1.1.0
