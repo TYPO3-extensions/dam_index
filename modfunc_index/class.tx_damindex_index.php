@@ -684,7 +684,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 	/**
 	 *
 	 */
-	function doIndexingCallback($type, $meta, $absFile, $fileArrKey, &$pObj) {
+	function doIndexingCallback($type, $meta, $absFile, $fileArrKey, $pObj) {
 		global $LANG, $TYPO3_CONF_VARS;
 
 			// get session data
