@@ -15,7 +15,7 @@ $EM_CONF[$_EXTKEY] = array(
 	'description' => 'Provides a Media submodule for mass indexing of files.',
 	'category' => 'module',
 	'shy' => 0,
-	'version' => '1.1.0',
+	'version' => '1.2.1-dev',
 	'dependencies' => 'dam',
 	'conflicts' => '',
 	'priority' => '',
@@ -36,7 +36,7 @@ $EM_CONF[$_EXTKEY] = array(
 		'depends' => array(
 			'dam' => '',
 			'php' => '4.0.0-',
-			'typo3' => '3.8.0-',
+			'typo3' => '4.5.0-',
 		),
 		'conflicts' => array(
 		),
