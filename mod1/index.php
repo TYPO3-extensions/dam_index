@@ -83,7 +83,6 @@ class tx_damindex_module1 extends tx_dam_SCbase {
 	 */
 	var $basicFF;
 
-
 	/**
 	 * Initializes the backend module
 	 *
@@ -93,7 +92,6 @@ class tx_damindex_module1 extends tx_dam_SCbase {
 		global  $TYPO3_CONF_VARS, $FILEMOUNTS;
 
 		parent::init();
-
 
 			// Init guiRenderList object:
 
@@ -120,13 +118,11 @@ class tx_damindex_module1 extends tx_dam_SCbase {
 		//
 		// Initialize the template object
 		//
-		$this->doc = t3lib_div::makeInstance('template'); 
+		$this->doc = t3lib_div::makeInstance('template');
 		$this->doc->backPath = $BACK_PATH;
 		$this->doc->setModuleTemplate(t3lib_extMgm::extRelPath('dam') . 'res/templates/mod_file_list.html');
 		$this->doc->styleSheetFile2 = t3lib_extMgm::extRelPath('dam') . 'res/css/stylesheet.css';
 		$this->doc->docType = 'xhtml_trans';
-
-
 
 		//
 		// There was access to this file path, continue ...
@@ -155,7 +151,6 @@ class tx_damindex_module1 extends tx_dam_SCbase {
 
 			$this->extObjHeader();
 
-
 			//
 			// Output tabmenu if not a single function was forced
 			//
@@ -170,9 +165,7 @@ class tx_damindex_module1 extends tx_dam_SCbase {
 			//
 			// Call submodule function
 			//
-
 			$this->extObjContent();
-
 
 			//
 			// output footer: search box, options, store control, ....
@@ -188,7 +181,7 @@ class tx_damindex_module1 extends tx_dam_SCbase {
 			}
 
 			$this->content.= $this->doc->spacer(10);
-			
+
 			$this->markers['CONTENT'] = $this->content;
 			$this->markers['TITLE'] = $LANG->getLL('title');
 			$docHeaderButtons = array(
@@ -196,7 +189,7 @@ class tx_damindex_module1 extends tx_dam_SCbase {
 				'UPLOAD' => $this->markers['UPLOAD'],
 				'REFRESH' => $this->markers['REFRESH'],
 				'FOLDER' => '',
-				'LEVEL_UP' => $this->markers['LEVEL_UP'], 
+				'LEVEL_UP' => $this->markers['LEVEL_UP'],
 				'RECORD_LIST' => $this->markers['RECORD_LIST'],
 				'SHORTCUT' => $this->markers['SHORTCUT'],
 			);
@@ -204,7 +197,7 @@ class tx_damindex_module1 extends tx_dam_SCbase {
 				// Build the <body> for the module
 			$this->content = $this->doc->startPage($LANG->getLL('title'));
 			$this->content.= $this->doc->moduleBody($this->pageinfo, $docHeaderButtons, $this->markers);
-			$this->content.= $this->doc->endPage();			
+			$this->content.= $this->doc->endPage();
 
 		} else {
 				// If no access or no path

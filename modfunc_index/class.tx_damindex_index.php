@@ -455,13 +455,19 @@ class tx_damindex_index extends t3lib_extobjbase {
 				$this->pObj->addParams['doIndexing'] = 1;
 
 					// reload at this time
-				$max_execution_time = ini_get('max_execution_time');
-								$max_execution_time = intval($max_execution_time) ? intval(($max_execution_time/3)*2) : 60;
-				$this->indexEndtime = time()+$max_execution_time;
 
+				/*
+				 *  set max_execution_time for indexing to 2/3 php max_execution_time,
+				 *  but not longer than 20 sec, as this is the display update intervall
+				 */
+
+				$max_execution_time = ini_get('max_execution_time');
+				$max_execution_time = intval($max_execution_time) ? intval(($max_execution_time/3)*2) : 20;
+				$max_execution_time = $max_execution_time < 20 ? $max_execution_time : 20;
+				$this->indexEndtime = time() + $max_execution_time;
 				echo '<head>
 					<title>indexing</title>
-					<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+					<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 					</head>
 					<body>';
 
@@ -469,6 +475,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 				echo '</body>
 					</html>';
+				ob_end_flush();
 				exit;
 			break;
 		}
@@ -631,9 +638,6 @@ class tx_damindex_index extends t3lib_extobjbase {
 		global $LANG, $TYPO3_CONF_VARS;
 
 
-			// makes sense? Was a hint on php.net
-		ob_end_flush();
-
 			// get session data - which might have left files stored
 		$indexSession = $this->indexSessionFetch();
 
@@ -641,7 +645,6 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 			$code = $LANG->getLL('tx_damindex_index.search_files');
 			$this->indexing_setMessage($code);
-			$this->indexing_flushNow();
 
 				// fetching file names is still without callback - billions of files will cause a timeout - ever?
 			$filesTodo = $this->index->collectFiles($this->pObj->path, $this->index->ruleConf['tx_damindex_rule_recursive']['enabled']);
@@ -651,7 +654,6 @@ class tx_damindex_index extends t3lib_extobjbase {
 			$this->index->stat = $indexSession['indexStat'];
 			$this->index->infoList = is_array($indexSession['infoList']) ? $indexSession['infoList'] : array();
 		}
-
 		if(tx_dam::config_getValue('setup.devel')) {
 			t3lib_div::print_array($indexSession);
 		}
@@ -659,11 +661,8 @@ class tx_damindex_index extends t3lib_extobjbase {
 		$this->index->setDryRun($this->index->ruleConf['tx_damindex_rule_dryRun']['enabled']);
 
 		if ($indexSession['totalFilesCount']) {
-
 			$this->index->collectMeta = TRUE;
-			$this->index->setIndexRun($indexSession['indexRun']);
 			$this->index->indexFiles($indexSession['filesTodo'], $this->pObj->defaultPid, array(&$this, 'doIndexingCallback'));
-
 			if (!$this->index->stat['totalCount']) {
 				$code = $LANG->getLL('tx_damindex_index.no_new_files');
 				$this->indexing_setMessage($code);
@@ -729,7 +728,6 @@ class tx_damindex_index extends t3lib_extobjbase {
 		}
 
 		$this->indexing_progressBar($indexSession['currentCount'], $indexSession['totalFilesCount']);
-		$this->indexing_flushNow();
 
 			// one step further - save session data
 		unset($indexSession['filesTodo'][$fileArrKey]);
@@ -737,12 +735,12 @@ class tx_damindex_index extends t3lib_extobjbase {
 		$indexSession['infoList'] =	$this->index->infoList;
 
 		$this->indexSessionWrite($indexSession);
-
 		if (($this->indexEndtime < time()) AND ($indexSession['currentCount'] < $indexSession['totalFilesCount'])) {
 			$params = $this->pObj->addParams;
 			$params['indexSessionID'] = $indexSession['ID'];
 			echo '
 				<script type="text/javascript">  window.location.href = unescape("'.t3lib_div::rawUrlEncodeJS(tx_dam_SCbase::linkThisScriptStraight($params)).'"); </script>';
+			ob_end_flush();
 			exit;
 		}
 	}
@@ -770,6 +768,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 				<script type="text/javascript" language="javascript"> parent.progress_bar_update('.$intCurrentPercent.'); </script>';
 		}
 		echo $strProgressBar;
+
 	}
 
 
@@ -803,17 +802,6 @@ class tx_damindex_index extends t3lib_extobjbase {
 		echo '
 			<script type="text/javascript" language="javascript"> parent.finished()</script>';
 	}
-
-
-	/**
-	 *
-	 */
-	function indexing_flushNow() {
-		flush();
-		ob_flush();
-	}
-
-
 
 
 
