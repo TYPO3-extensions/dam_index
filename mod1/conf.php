@@ -11,6 +11,6 @@ $MCONF['access']='user,group';
 $MCONF['script']='index.php';
 $MCONF['navFrameScriptParam']='&folderOnly=1';
 
-$MLANG['default']['tabs_images']['tab'] = 'moduleicon.gif';
+$MLANG['default']['tabs_images']['tab'] = 'moduleicon.png';
 $MLANG['default']['ll_ref']='LLL:EXT:dam_index/mod1/locallang_mod.xml';
 ?>

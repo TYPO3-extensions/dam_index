@@ -247,7 +247,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 				$content.= $this->pObj->doc->section($header,$this->getStepsBar($step,$lastStep),0,1);
 				$content.= $this->pObj->doc->spacer(5);
 
-				$code = '<table border="0" cellspacing="0" cellpadding="4" width="100%">'.$this->index->getIndexingOptionsForm().'</table>';
+				$code = '<table border="0" cellspacing="0" cellpadding="4" width="100%">' . $this->index->getIndexingOptionsForm() . '</table>';
 				$content.= $this->pObj->doc->section($LANG->getLL('options').':',$code,1,0);
 
 			break;
@@ -276,7 +276,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 				$fixedFields = array_keys($this->index->dataPostset);
 
 				$code = '<table border="0" cellpadding="4" width="100%"><tr>
-					<td bgcolor="'.$this->pObj->doc->bgColor3dim.'">'.$this->getPresetForm($rec,$fixedFields,'tx_damindex_index.fixed_desc').'</td>
+					<td>' . $this->getPresetForm($rec, $fixedFields, 'tx_damindex_index.fixed_desc') . '</td>
 					</tr></table>';
 				$content.= $this->pObj->doc->section('',$code,0,1);
 			break;
@@ -316,14 +316,16 @@ class tx_damindex_index extends t3lib_extobjbase {
 				$content.= $this->pObj->doc->section($header,$stepsBar,0,1);
 
 				$content.= '<div id="summaryInfoDiv">';
-				$content.= '<strong>'.$LANG->getLL('tx_damindex_index.set_options').'</strong><table border="0" cellspacing="0" cellpadding="4" width="100%">'.$this->index->getIndexingOptionsInfo().'</table>';
+				$content.= 	$this->pObj->doc->sectionHeader($LANG->getLL('tx_damindex_index.set_options'), 0);
+				$content .= '<table border="0" cellspacing="0" cellpadding="4" width="100%">'.$this->index->getIndexingOptionsInfo().'</table>';
 
 				$content.= $this->pObj->doc->spacer(10);
 
 				$rec = array_merge($this->index->dataPreset,$this->index->dataPostset);
 
 				$fixedFields=array_keys($this->index->dataPostset);
-				$content.= '<strong>'.$LANG->getLL('tx_damindex_index.meta_data_preset').'</strong><br /><table border="0" cellpadding="4" width="100%"><tr><td bgcolor="'.$this->pObj->doc->bgColor3dim.'">'.
+				$content .= 	$this->pObj->doc->sectionHeader($LANG->getLL('tx_damindex_index.meta_data_preset'), 0);
+				$content.= '<table border="0" cellpadding="4" width="100%"><tr><td>'.
 								$this->showPresetData($rec,$fixedFields).
 								'</td></tr></table>';
 
@@ -366,8 +368,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 						var tbody = document.getElementById("table1").getElementsByTagName("tbody")[0];
 						var row = document.createElement("TR");
-
-						row.style.backgroundColor = "'.$this->pObj->doc->bgColor4.'";
+						row.className = "db_list_normal";
 
 						for (var cellId in cells) {
 							var tdCell = document.createElement("TD");
@@ -435,14 +436,16 @@ class tx_damindex_index extends t3lib_extobjbase {
 				$code.= '
 					<div id="message" style="margin-top:1em;"></div>
 					<div id="table1" style="display:none;margin-top:1em;">
-					<table cellpadding="1" cellspacing="1" border="0" width="100%">
-					<tr id="table1header" class="bgColor5">
-						<th>&nbsp;</th>
-						<th>'.$LANG->sL('LLL:EXT:dam/locallang_db.xml:tx_dam_item.file_name',1).'</th>
-						<th>'.$LANG->sL('LLL:EXT:dam/locallang_db.xml:tx_dam_item.file_type',1).'</th>
-						<th>'.$LANG->sL('LLL:EXT:dam/locallang_db.xml:tx_dam_item.abstract',1).'</th>
-						<th>'.$LANG->sL('LLL:EXT:dam/locallang_db.xml:tx_dam_item.file_path',1).'</th>
-					</tr>
+					<table cellpadding="1" cellspacing="0" cellpadding="0" border="0" width="100%" class="typo3-dblist typo3-filelist">
+					<tbody>
+						<tr id="table1header" class="t3-row-header">
+							<td class="c-headLine">&nbsp;</td>
+							<td class="c-headLine">'.$LANG->sL('LLL:EXT:dam/locallang_db.xml:tx_dam_item.file_name',1).'</td>
+							<td class="c-headLine">'.$LANG->sL('LLL:EXT:dam/locallang_db.xml:tx_dam_item.file_type',1).'</td>
+							<td class="c-headLine">'.$LANG->sL('LLL:EXT:dam/locallang_db.xml:tx_dam_item.abstract',1).'</td>
+							<td class="c-headLine">'.$LANG->sL('LLL:EXT:dam/locallang_db.xml:tx_dam_item.file_path',1).'</td>
+						</tr>
+					</tbody>
 					</table>
 					</div>
 				';
@@ -545,7 +548,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 
 
 			// add message for checkboxes
-		$editForm='<tr bgcolor="'.$this->pObj->doc->bgColor4.'">
+		$editForm='<tr style="background-color: #EAF7FF;">
 				<td nowrap="nowrap" valign="middle">'.
 				'<span style="padding: 0 10px 0 10px">'.
 				'<img'.t3lib_iconWorks::skinImg($GLOBALS['BACK_PATH'], 'gfx/pil2down.gif', 'width="12" height="7"').' alt="" />'.
@@ -879,34 +882,33 @@ class tx_damindex_index extends t3lib_extobjbase {
 	function getStepsBar($currentStep, $lastStep, $onClickBack='' ,$onClickFwd='', $buttonNameBack='', $buttonNameFwd='') {
 		global $LANG;
 
-		$bgcolor = t3lib_div::modifyHTMLcolor($this->pObj->doc->bgColor,-15,-15,-15);
-		$nrcolor = t3lib_div::modifyHTMLcolor($bgcolor,30,30,30);
-
 		$buttonNameBack = $buttonNameBack ? $buttonNameBack : $LANG->getLL('tx_damindex_index.back');
 		$buttonNameFwd = $buttonNameFwd ? $buttonNameFwd : $LANG->getLL('tx_damindex_index.next');
 
 		$content='';
-		$buttons='';
-
-		for ($i = 1; $i <= $lastStep; $i++) {
-			$color = ($i == $currentStep) ? '#000' : $nrcolor ;
-			$content.= '<span style="margin-left:5px; margin-right:5px; color:'.$color.';">'.$i.'</span>';
-		}
-		$content = '<span style="margin-left:50px; margin-right:25px; vertical-align:middle; font-family:Verdana,Arial,Helvetica; font-size:22px; font-weight:bold;">'.$content.'</span>';
 
 		if($currentStep > 1) {
-			$buttons.= '<input type="submit" name="indexStep['.($currentStep-1).']" onclick="'.htmlspecialchars($onClickBack).'" value="'.htmlspecialchars($buttonNameBack).'" style="margin-right:10px;" />';
+			$content .= '<div class="dam-index-steps-button-wrapper-left"><input type="submit" name="indexStep[' . ($currentStep-1) . ']" onclick="' . htmlspecialchars($onClickBack) . '" value="' . htmlspecialchars($buttonNameBack) . '" style="margin-right: 12px;" /></div>';
+		} else {
+			$content .= '<div class="dam-index-steps-button-placeholder">&nbsp;</div>';
 		}
 
+		$content .= '<div class="dam-index-steps-numbers">';
+
+		for ($i = 1; $i <= $lastStep; $i++) {
+			$currentStepClass = ($i == $currentStep) ? 'dam-index-step-active' : 'dam-index-step-passive';
+			$content .= '<span class="dam-index-step ' . $currentStepClass . '">' . $i . '</span>';
+		}
+
+		$content .= '</div>';
 
 		if($currentStep < $lastStep) {
-			$buttons.= '<input type="submit" name="indexStep['.($currentStep+1).']" onclick="'.htmlspecialchars($onClickFwd).'" value="'.htmlspecialchars($buttonNameFwd).'" />';
+			$content .= '<div class="dam-index-steps-button-wrapper-right"><input class="dam-index-steps-button" type="submit" name="indexStep[' . ($currentStep+1) . ']" onclick="' . htmlspecialchars($onClickFwd) . '" value="' . htmlspecialchars($buttonNameFwd) . '"  style="margin-left: 12px;" /></div>';
 		} else {
-			$buttons.= '<input type="submit" name="indexStart" value="'.htmlspecialchars($buttonNameFwd).'" onclick="'.htmlspecialchars($onClickFwd).'" style="font-weight:bold;background-color: #6b6;" />';
+			$content .= '<div class="dam-index-steps-button-wrapper-right"><input class="dam-index-steps-button" type="submit" name="indexStart" value="' . htmlspecialchars($buttonNameFwd) . '" onclick="' . htmlspecialchars($onClickFwd) . '" style="font-weight:bold; margin-left: 12px;" /></div>';
 		}
-		$content.= '<span id="stepsFormButtons" style="margin-left:25px;vertical-align:middle;">'.$buttons.'</span>';
 
-		return '<div style="padding:4px; background:'.$bgcolor.';">'.$content.'</div><br />';
+		return '<div class="dam-index-steps">' . $content . '<div class="dam-index-steps-clearer"></div></div><br />';
 	}
 
 
