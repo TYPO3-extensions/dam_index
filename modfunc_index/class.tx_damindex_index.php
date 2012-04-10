@@ -406,7 +406,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 				if(tx_dam::config_getValue('setup.devel')) {
 					$iframeSize = 'width="100%" height="300" border="1" scrolling="yes" frameborder="1"';
 				} else {
-					$iframeSize = 'width="0" height="0" border="0" scrolling="no" frameborder="0"';
+					$iframeSize = 'style="height: 0; width: 0; border: 0;" scrolling="no" frameborder="0"';
 				}
 
 
