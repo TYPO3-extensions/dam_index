@@ -658,7 +658,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 			$this->index->infoList = is_array($indexSession['infoList']) ? $indexSession['infoList'] : array();
 		}
 		if(tx_dam::config_getValue('setup.devel')) {
-			t3lib_div::print_array($indexSession);
+			t3lib_utility_Debug::printArray($indexSession);
 		}
 
 		$this->index->setDryRun($this->index->ruleConf['tx_damindex_rule_dryRun']['enabled']);
@@ -698,7 +698,7 @@ class tx_damindex_index extends t3lib_extobjbase {
 		if(is_array($meta) AND is_array($meta['fields'])) {
 
 			if(tx_dam::config_getValue('setup.devel')) {
-				t3lib_div::print_array(array(
+				t3lib_utility_Debug::printArray(array(
 						'file_name' => $meta['fields']['file_name'],
 						'indexExist' => $meta['indexExist'],
 						'reindexed' => $meta['reindexed'],
