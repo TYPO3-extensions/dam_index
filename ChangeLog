@@ -1,3 +1,19 @@
+2012-05-15 Lorenz Ulrich <lorenz.ulrich@visol.ch>
+
+    * [TASK] #M18540 Remove calls to deprecated/removed functions
+
+2012-04-10 Lorenz Ulrich <lorenz.ulrich@visol.ch>
+
+    * [TASK] #M18538 Adjust styling of dam_index to TYPO3 4.5+
+
+2012-04-10 Lorenz Ulrich <lorenz.ulrich@visol.ch>
+
+    * [BUGFIX] #M18454 iframe used to update the indexing statusbar too big
+
+2011-10-17 Lorenz Ulrich <lorenz.ulrich@visol.ch>
+
+    * [BUGFIX] #M10546 Progress update does not work with BE compression (Thanks Björn Pedersen)
+
 2011-01-26  Dan Osipov <dosipov@phillyburbs.com>
 
 	* Update ext_emconf.php following release of 1.2.0
